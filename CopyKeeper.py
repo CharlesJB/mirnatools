@@ -64,7 +64,7 @@ class CopyKeeper:
 				elif i == 3:
 					quality = line.strip()
 
-					if sequence in self.seqCounts:
+					if sequence in self.seqCounts and self.seqCounts[sequence] >= self.minCopy:
 						print header
 						print sequence
 						print dummy
