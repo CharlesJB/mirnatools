@@ -27,9 +27,14 @@ class CopyKeeper:
 		self.seqCounts = {}
 
 	def processFile(self):
+		i = 0
 		for line in open(self.inputFile):
-			sequence = line.strip()
-			self.processSequence(sequence)
+			if i == 1:
+				sequence = line.strip()
+				self.processSequence(sequence)
+			i += 1
+			if i == 4:
+				i = 0
 
 	def processSequence(self, sequence):
 		if sequence in self.seqCounts:
