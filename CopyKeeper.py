@@ -82,21 +82,11 @@ if __name__=="__main__":
                 print __doc__
                 sys.exit(1)
 
-        minCopy = int(sys.argv[1])
-	outputType = sys.argv[2]
+	inputFile = sys.argv[1]
+        minCopy = int(sys.argv[2])
+	outputType = sys.argv[3]
 	
-        copyKeeper = CopyKeeper(minCopy)
-
-        i =0
-        for line in sys.stdin:
-                if i==1:
-                        sequence = line.strip()
-                        copyKeeper.processSequence(sequence)
-
-                i+=1
-
-                if i==4:
-                        i=0
-
+        copyKeeper = CopyKeeper(inputFile, minCopy)
+	copyKeeper.processFile()
         copyKeeper.printResults(outputType)
 
