@@ -29,10 +29,10 @@ class CountGetter:
 		sequence = ""
 		for line in open(fasta_filename):
 			if count == 0:
-				header = line
+				header = line.strip()
 				count = 1
 			else:
-				sequence = line
+				sequence = line.strip()
 				ID = self.fetchID(header)
 				if ID in self.IDs:
 					print header
