@@ -16,12 +16,12 @@ class Printer:
 		if '>' in line:
 			if "Homo" in line:
 				self.printing = True
-				print line
+				print line.strip()
 			else:
 				self.printing = False
 		else:
 			if self.printing == True:
-				print line
+				print line.strip()
 				
 
 import sys
