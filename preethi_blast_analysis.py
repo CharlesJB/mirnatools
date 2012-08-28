@@ -126,7 +126,8 @@ class Parser:
 	def fetchScore(self, line):
 		tokens = line.split()
 		name = tokens[0]
-		score = float(tokens[5])
+#		score = float(tokens[5])
+		score = float(tokens[len(tokens)-2])
 		self.token.setData(name, "score", score)
 
 	def fetchIdentitiesAndGaps(self, name, line):
@@ -334,13 +335,16 @@ class BlastAnalyzer:
 		done = False
 		count = 0
 		while done == False:
-			print "====== Token: " + str(count+1) + " ======"
+#			print "====== Token: " + str(count+1) + " ======"
 			count += 1
 			self.parser.createNextToken()
+			if count % 1000 == 0:
+				print count, " blast hits processed."
 			if self.parser.isEOF() != True:
 				token = self.parser.getToken()
 				self.processToken(token)
 			else:
+				print count, " blast hits processed."
 				done = True
 
 	def printAll(self):
