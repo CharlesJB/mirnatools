@@ -27,7 +27,7 @@ class DistributionCalculator:
 
         def printResults(self):
 		# Calculate total number of sequences (if not specified by user)
-		if len(self.total) == 0:
+		if self.total == 0:
 			total = 0
 			for i in range(self.maxLength):
 				total += self.distribution[i]
@@ -42,12 +42,15 @@ class DistributionCalculator:
 import sys
 
 if __name__=="__main__":
-        if len(sys.argv)!=2 or len(sys.argv)!=3:
+        if len(sys.argv)!=2 and len(sys.argv)!=3:
                 print __doc__
                 sys.exit(1)
 
         maxLength=int(sys.argv[1])
-	total=int(sys.argv[2])
+	if len(sys.argv) == 3:
+		total=int(sys.argv[2])
+	else: 
+		total = 0
         distributionCalculator = DistributionCalculator(maxLength, total)
 
         i =0
