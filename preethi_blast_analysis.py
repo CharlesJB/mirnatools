@@ -235,6 +235,9 @@ class BlastAnalyzer:
 		self.perfectSeqIDs = {} # The name of the sequences that blast to each miRNA
 		self.looseCounts = {}
 		self.looseSeqIDs = {} # The name of the sequences that blast to each miRNA
+		self.noMatchLength = {}
+		self.noMatchMismatches = {}
+		self.noMatchGaps = {}
 
 	def addSeqName(self, key, result, name):
 		if result == "perfectMatch":
@@ -299,13 +302,13 @@ class BlastAnalyzer:
 
 		# Check for no match
 		if query_start > 4 or query_end <= query_length - 4:
-			return "noMatch"
+			return "noMatch, length"
 		if name_start > 4 or name_end <= name_length - 4:
-			return "noMatch"
+			return "noMatch, length"
 		if gaps > 0:
-			return "noMatch"
+			return "noMatch, gaps"
 		if mismatches > 3:
-			return "noMatch"
+			return "noMatch, mismatches"
 
 		# Check for perfect match
 		if mismatches == 0:
@@ -321,6 +324,25 @@ class BlastAnalyzer:
 		self.addCount(name, result, count)
 		self.addSeqName(name, result, token.getID())
 
+	def addNoMatch(self, result, token, i):
+		count = float(token.getCount()) / float(token.getNumberOfResult())
+		name = token.getNames()[i]
+		if result == "noMatch, length":
+			if name in self.noMatchLength:
+				self.noMatchLength[name] += count
+			else:
+				self.noMatchLength[name] = count
+		elif result == "noMatch, gaps":
+			if name in self.noMatchGaps:
+				self.noMatchGaps[name] += count
+			else:
+				self.noMatchGaps[name] = count
+		elif result == "noMatch, mismatches":
+			if name in self.noMatchMismatches:
+				self.noMatchMismatches[name] += count
+			else:
+				self.noMatchMismatches[name] = count
+
 	def processToken(self, token):
 		# We keep only miRNA having the best score
 		self.processScores(token)
@@ -328,9 +350,11 @@ class BlastAnalyzer:
 		# Check if we have a perfect match, a loose match or no match at all
 		for i in range (0, token.getNumberOfResult()):
 			result = self.processMatch(token, i)
-			if result != "noMatch":
+			if result == "looseMatch" or result == "perfectMatch":
 				self.addResults(result, token, i)
-
+			else:
+				self.addNoMatch(result, token, i)
+				
 	def parseFile(self):
 		done = False
 		count = 0
@@ -378,6 +402,23 @@ class BlastAnalyzer:
 				toPrint = toPrint + '\t' + self.looseSeqIDs[miRNA][i]
 			toPrint += '\n'
 			f.write(toPrint)
+		f.close()
+
+		# Print sequences that didn't made it
+		filename = output +  "_noMatchLength.txt"
+		f = open(filename, 'w')
+		for miRNA in self.noMatchLength:
+			f.write(miRNA + '\t' + str(self.noMatchLength[miRNA]) + '\n')
+		f.close()
+		filename = output +  "_noMatchGaps.txt"
+		f = open(filename, 'w')
+		for miRNA in self.noMatchGaps:
+			f.write(miRNA + '\t' + str(self.noMatchGaps[miRNA]) + '\n')
+		f.close()
+		filename = output +  "_noMatchMismatches.txt"
+		f = open(filename, 'w')
+		for miRNA in self.noMatchMismatches:
+			f.write(miRNA + '\t' + str(self.noMatchMismatches[miRNA]) + '\n')
 		f.close()
 
 import sys
