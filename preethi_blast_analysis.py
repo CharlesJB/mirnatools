@@ -235,9 +235,13 @@ class BlastAnalyzer:
 		self.perfectSeqIDs = {} # The name of the sequences that blast to each miRNA
 		self.looseCounts = {}
 		self.looseSeqIDs = {} # The name of the sequences that blast to each miRNA
+		# Below are for the analysis of sequences that didn't pass the filtering
 		self.noMatchLength = {}
 		self.noMatchMismatches = {}
 		self.noMatchGaps = {}
+		self.noMatchLength_IDs = {}
+		self.noMatchMismatches_IDs = {}
+		self.noMatchGaps_IDs = {}
 
 	def addSeqName(self, key, result, name):
 		if result == "perfectMatch":
@@ -324,24 +328,17 @@ class BlastAnalyzer:
 		self.addCount(name, result, count)
 		self.addSeqName(name, result, token.getID())
 
-	def addNoMatch(self, result, token, i):
+	def addNoMatch(self, container, containerID, token, i):
 		count = float(token.getCount()) / float(token.getNumberOfResult())
 		name = token.getNames()[i]
-		if result == "noMatch, length":
-			if name in self.noMatchLength:
-				self.noMatchLength[name] += count
-			else:
-				self.noMatchLength[name] = count
-		elif result == "noMatch, gaps":
-			if name in self.noMatchGaps:
-				self.noMatchGaps[name] += count
-			else:
-				self.noMatchGaps[name] = count
-		elif result == "noMatch, mismatches":
-			if name in self.noMatchMismatches:
-				self.noMatchMismatches[name] += count
-			else:
-				self.noMatchMismatches[name] = count
+		ID = token.getID()
+		if name in container:
+			container[name] += count
+		else:
+			container[name] = count			
+		if name not in containerID:
+			containerID[name] = []
+		containerID[name].append(ID)
 
 	def processToken(self, token):
 		# We keep only miRNA having the best score
@@ -353,7 +350,12 @@ class BlastAnalyzer:
 			if result == "looseMatch" or result == "perfectMatch":
 				self.addResults(result, token, i)
 			else:
-				self.addNoMatch(result, token, i)
+				if result == "noMatch, length":
+					self.addNoMatch(self.noMatchLength, self.noMatchLength_IDs, token, i)
+				elif result == "noMatch, gaps":
+					self.addNoMatch(self.noMatchGaps, self.noMatchGaps_IDs, token, i)
+				elif result == "noMatch, mismatches":
+					self.addNoMatch(self.noMatchMismatches, self.noMatchMismatches_IDs, token, i)
 				
 	def parseFile(self):
 		done = False
@@ -370,56 +372,44 @@ class BlastAnalyzer:
 			else:
 				print count, " blast hits processed."
 				done = True
+	def printCount(self, filename, container):
+		f = open(filename, 'w')
+		for miRNA in container:
+			f.write(miRNA + '\t' + str(container[miRNA]) + '\n')
+		f.close()
+
+	def printID(self, filename, container):
+		f = open(filename, 'w')
+		for miRNA in container:
+			toPrint = miRNA
+			for i in range(0, len(container[miRNA])):
+				toPrint = toPrint + '\t' + container[miRNA][i]
+			toPrint += '\n'
+			f.write(toPrint)
+		f.close()
 
 	def printAll(self):
 		# Print perfect matches
 		filename = output + "_perfectMatches.txt"
-		f = open(filename, 'w')
-		for miRNA in self.perfectCounts:
-			f.write(miRNA + '\t' + str(self.perfectCounts[miRNA]) + '\n')
-		f.close()
+		self.printCount(filename, self.perfectCounts)
 		filename = output + "_perfectSeqID.txt"
-		f = open(filename, 'w')
-		for miRNA in self.perfectSeqIDs:
-			toPrint = miRNA
-			for i in range(0, len(self.perfectSeqIDs[miRNA])):
-				toPrint = toPrint + '\t' + self.perfectSeqIDs[miRNA][i]
-			toPrint += '\n'
-			f.write(toPrint)
-		f.close()
-
-		# Print loose matches
+		self.printID(filename, self.perfectSeqIDs)
 		filename = output + "_looseMatches.txt"
-		f = open(filename, 'w')
-		for miRNA in self.looseCounts:
-			f.write(miRNA + '\t' + str(self.looseCounts[miRNA]) + '\n')
-		f.close()
+		self.printCount(filename, self.looseCounts)
 		filename = output + "_looseSeqID.txt"
-		f = open(filename, 'w')
-		for miRNA in self.looseSeqIDs:
-			toPrint = miRNA
-			for i in range(0, len(self.looseSeqIDs[miRNA])):
-				toPrint = toPrint + '\t' + self.looseSeqIDs[miRNA][i]
-			toPrint += '\n'
-			f.write(toPrint)
-		f.close()
-
-		# Print sequences that didn't made it
+		self.printID(filename, self.looseSeqIDs)
 		filename = output +  "_noMatchLength.txt"
-		f = open(filename, 'w')
-		for miRNA in self.noMatchLength:
-			f.write(miRNA + '\t' + str(self.noMatchLength[miRNA]) + '\n')
-		f.close()
+		self.printCount(filename, self.noMatchLength)
 		filename = output +  "_noMatchGaps.txt"
-		f = open(filename, 'w')
-		for miRNA in self.noMatchGaps:
-			f.write(miRNA + '\t' + str(self.noMatchGaps[miRNA]) + '\n')
-		f.close()
+		self.printCount(filename, self.noMatchGaps)
 		filename = output +  "_noMatchMismatches.txt"
-		f = open(filename, 'w')
-		for miRNA in self.noMatchMismatches:
-			f.write(miRNA + '\t' + str(self.noMatchMismatches[miRNA]) + '\n')
-		f.close()
+		self.printCount(filename, self.noMatchMismatches)
+		filename = output +  "_noMatchLength_ID.txt"
+		self.printID(filename, self.noMatchLength_IDs)
+		filename = output +  "_noMatchGaps_ID.txt"
+		self.printID(filename, self.noMatchGaps_IDs)
+		filename = output +  "_noMatchMismatches_ID.txt"
+		self.printID(filename, self.noMatchMismatches_IDs)
 
 import sys
 
