@@ -235,6 +235,7 @@ class BlastAnalyzer:
 		self.perfectSeqIDs = {} # The name of the sequences that blast to each miRNA
 		self.looseCounts = {}
 		self.looseSeqIDs = {} # The name of the sequences that blast to each miRNA
+		self.combinedCounts = {}
 		# Below are for the analysis of sequences that didn't pass the filtering
 		self.noMatchLength = {}
 		self.noMatchMismatches = {}
@@ -286,6 +287,10 @@ class BlastAnalyzer:
 				self.looseCounts[key] += count
 			else:
 				self.looseCounts[key] = count
+		if key in self.combinedCounts:
+			self.combinedCounts[key] += count
+		else:
+			self.combinedCounts[key] = count
 
 	def getCount(self, key, result):
 		if result == "perfectMatch":
@@ -394,10 +399,15 @@ class BlastAnalyzer:
 		self.printCount(filename, self.perfectCounts)
 		filename = output + "_perfectSeqID.txt"
 		self.printID(filename, self.perfectSeqIDs)
+		# Print loose matches
 		filename = output + "_looseMatches.txt"
 		self.printCount(filename, self.looseCounts)
 		filename = output + "_looseSeqID.txt"
 		self.printID(filename, self.looseSeqIDs)
+		# Print combined (loose + perfect) matches
+		filename = output + "_combinedMatches.txt"
+		self.printCount(filename, self.combinedCounts)
+		# Print no matches
 		filename = output +  "_noMatchLength.txt"
 		self.printCount(filename, self.noMatchLength)
 		filename = output +  "_noMatchGaps.txt"
