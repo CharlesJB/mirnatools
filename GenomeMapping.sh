@@ -37,9 +37,28 @@ echo "Beginning blast analysis..."
 $scriptsPath/BlastAnalysis.sh $reference $usableSequences
 echo "Done!"
 
-# 2. 
 echo ""
 echo "Beginning length distribution analysis..."
 blastOutput="$(basename ${reference%.*}).out"
 $scriptsPath/LengthDistributionAnalysis.sh $blastOutput $idToRemove $usableSequences $scriptsPath
 echo "Done!"
+
+# 3. Contribution analysis
+echo ""
+echo "Beginning contribution analysis..."
+baseRef=$(basename ${reference%.*})
+$scriptsPath/ContributionAnalysis.sh $baseRef $usableSequences $scriptsPath
+echo "Done!"
+
+# 4. Calculation of the total of sequences
+echo ""
+echo "Calculating total number of sequences..."
+totalOutput=$baseRef"_totalCount.txt"
+grep '>' $baseRef"_blast_ID_unique.fa" | awk '{ SUM += $4 } END { print SUM }' > $totalOutput
+totalCount=$(cat $totalOutput)
+echo "    $totalCount sequences matched $baseRef!"
+echo "Done!"
+
+# 5. Clean up
+rm *.tmp
+echo ""
