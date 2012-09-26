@@ -17,11 +17,11 @@ class CountGetter:
 
 	def fetchIDs(self, ID_filename):
 		for line in open(ID_filename):
-			tokens = line.split()
+			tokens = line.strip().split()
 			self.IDs.append(tokens[0])
 
 	def fetchID(self, line):
-		return line.split()[0][1:]
+		return line.split()[1]
 
 	def printAll(self, fasta_filename):
 		count = 0
