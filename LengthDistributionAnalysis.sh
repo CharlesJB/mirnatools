@@ -57,4 +57,4 @@ cat $uniqueFastaOutput | $scriptsPath/LengthDistribution.py 60 > $lengthDistOutp
 
 # 5. Plot the distribution
 echo "	Plotting the distribution."
-Rscript $scriptsPath/PlotLengthDistribution.R $lengthDistOutput ${blastOutput%.*} &> /dev/null
+Rscript $scriptsPath/PlotLengthDistribution.R $lengthDistOutput ${blastOutput%.*} | sed '/null device/d' | sed -e '/          1/d'

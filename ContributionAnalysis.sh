@@ -37,4 +37,4 @@ cat $uniqueFastaOutput | $scriptsPath/LengthDistribution.py 60 $numberOfSequence
 # 3. Plot the relative distribution
 echo "	Plotting the relative distribution."
 cat $usableSequences | $scriptsPath/LengthDistribution.py 60 > lengthDist.tmp
-Rscript $scriptsPath/PlotRelativeLengthDistribution.R $relativeOutput lengthDist.tmp $baseRef &> /dev/null
+Rscript $scriptsPath/PlotRelativeLengthDistribution.R $relativeOutput lengthDist.tmp $baseRef | sed '/null device/d' | sed -e '/          1/d'
