@@ -35,7 +35,10 @@ class DistributionCalculator:
 			total = self.total
 		# Print percentage of total for each lenght
                 for i in range(self.maxLength):
-			percent = self.distribution[i] / float(total) * 100
+			if total != 0:
+				percent = self.distribution[i] / float(total) * 100
+			else:
+				percent = 0
                         print str(i) + "\t" + str(percent)
 	
 
