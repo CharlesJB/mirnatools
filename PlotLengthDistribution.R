@@ -6,6 +6,8 @@ if (length(argv) == 2) {
     
     # 1. Open device
     outputFilename <- paste("lengthDist_", output, ".jpeg", sep="")
+    message <- paste("\t\tSaving plot to: ", outputFilename, "\n", sep="")
+    cat(message)
     jpeg(outputFilename)
 
     # 2. Read data
