@@ -39,7 +39,7 @@ class DistributionCalculator:
 				percent = self.distribution[i] / float(total) * 100
 			else:
 				percent = 0
-                        print str(i) + "\t" + str(percent)
+                        print str(i) + "\t" + "%.8f" % percent
 	
 
 import sys
