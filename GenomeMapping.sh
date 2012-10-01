@@ -7,7 +7,7 @@ Usage() {
 	echo "referenceData: For the blast analysis. Must be in fasta format."
 	echo "usableSequences: List of valid RNA sequence (after trimming)."
 	echo "scriptsPath: path containing the miRNA-Tools git clone."
-	echo "             (https://github.com/CharlesJB/miRNA-Tools)"
+	echo "			 (https://github.com/CharlesJB/miRNA-Tools)"
 }
 
 ValidateFile() {
@@ -56,7 +56,7 @@ echo "Calculating total number of sequences..."
 totalOutput=$baseRef"_totalCount.txt"
 grep '>' $baseRef"_blast_ID_unique.fa" | awk '{ SUM += $4 } END { print SUM }' > $totalOutput
 totalCount=$(cat $totalOutput)
-echo "    $totalCount sequences matched $baseRef!"
+echo "	$totalCount sequences matched $baseRef!"
 echo "Done!"
 
 # 5. Clean up
