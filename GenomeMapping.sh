@@ -56,6 +56,10 @@ echo "Calculating total number of sequences..."
 totalOutput=$baseRef"_totalCount.txt"
 grep '>' $baseRef"_blast_ID_unique.fa" | awk '{ SUM += $4 } END { print SUM }' > $totalOutput
 totalCount=$(cat $totalOutput)
+if [ "$totalCount" == "" ]
+then
+    totalCount=0
+fi
 echo "	$totalCount sequences matched $baseRef!"
 echo "Done!"
 
