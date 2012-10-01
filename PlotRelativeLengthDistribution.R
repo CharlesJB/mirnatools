@@ -6,7 +6,7 @@ if (length(argv) == 3) {
     output <- argv[3]
     
     # 1. Open device
-    outputFilename <- paste("lengthDist_", output, ".jpeg", sep="")
+    outputFilename <- paste("lengthDist_", output, "_relative.jpeg", sep="")
     jpeg(outputFilename)
 
     # 2. Read data
