@@ -27,7 +27,7 @@ then
 	echo ""
 	echo "	Doing the actual blast."
 	out=$(basename ${reference%.*}).out
-	blastn -task blastn-short -db ${input%.*} -query $usableSequences -out $out -word_size 4 -evalue 0.01 -num_threads 24
+	blastn -task blastn-short -db ${input%.*} -query $usableSequences -out $out -word_size 4 -evalue 0.01 -num_threads 4
 else
 	echo "Cannot find reference data: $reference"
 	echo "Usage:"
