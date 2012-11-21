@@ -9,7 +9,6 @@ import sys
 
 if len(sys.argv)!=4:
 	print ""
-	print "This program keeps only sequence containing the full sequence of an adaptor."
 	print "This program keeps only things before the adaptor."
 	print ""
 	print "Usage "
