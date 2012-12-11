@@ -12,7 +12,7 @@ if len(sys.argv)!=4:
 	print "This program keeps only things before the adaptor."
 	print ""
 	print "Usage "
-	print "cat joe.fastq | ./AdaptorFinder.py <adaptorSequence> <trimSize> <maxMismatches> > joe.trimmed.fastq"
+	print "cat joe.fastq | ./AdaptorFinder2.py <adaptorSequence> <trimSize> <maxMismatches> > joe.trimmed.fastq"
 	print "trimSize: If no match is found with adaptor, the script will try again removing 1 base at a time,"
 	print "          until a match is found or trimSize base are removed."
 	print "maxMismatches: Maximum number of mismatches that can be tolerated."
