@@ -24,7 +24,7 @@ if (length(argv) == 3) {
     lines(total, type="l", col="black")
 
     # 4. Annotate the plot
-    legend(28, 21, c("Total Sequences", output), lty=c(1,1), col=c("black", "red"))
+    legend(28, maxRange/2, c("Total Sequences", output), lty=c(1,1), col=c("black", "red"))
     titleName <- paste("Relative Contribution - ", output, sep="")
     title(main=titleName)
     axis(1, at=10:40, labels=10:40)
