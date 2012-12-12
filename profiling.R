@@ -1,15 +1,17 @@
 library(sfsmisc)
 
-data <- read.table("mature_combinedMatches_relativeCount.txt")
-x <- seq(1:nrow(data))
-y <- data[,2]
+drawPlot <- function(type, inputFilename, outputBasename) {
+    data <- read.table(inputFilename)
+    x <- seq(1:nrow(data))
+    y <- data[,2]
 
-drawPlot <- function(type) {
     if (type == "jpeg") {
-        jpeg("Profiling_miRNA.jpeg")
+	filename = paste(outputBasename, ".jpeg", sep="")
+        jpeg(filename)
     }
     if (type == "tiff") {
-        tiff("Profiling_miRNA.tiff")
+	filename = paste(outputBasename, ".tiff", sep="")
+        tiff(filename)
     }
     # Draw empty plot
     plot(x, y, type = "n", xaxt = "n", yaxt="n", xlab="", ylab="", log = "y", col="blue")
@@ -33,5 +35,21 @@ drawPlot <- function(type) {
     dev.off()
 }
 
-drawPlot("jpeg")
-drawPlot("tiff")
+argv <- commandArgs(trailingOnly = T)
+
+if (length(argv) == 3) {
+	type <- argv[1]
+	inputFilename <- argv[2]
+	outputBasename <- argv[3]
+
+	drawPlot(type, inputFilename, outputBasename)
+
+} else {
+
+	cat("\nUsage:\n")
+	cat("profiling.R <type> <inputFilename> <outputBasename>\n")
+	cat("    type: type of file (jpeg, tiff, pdf, etc...)\n")
+	cat("    inputFilename: File containing the relative count of mature miRNA\n")
+	cat("    outputBasename: basename for the output file.\n")
+
+}
