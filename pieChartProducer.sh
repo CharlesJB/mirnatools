@@ -31,6 +31,6 @@ distributionFile=${output%.*}"_distribution.txt"
 sort -k2 -nr $output | head -n15 > $distributionFile
 echo -e "others\t$(sort -k2 -nr $output | tail -n+16 | awk '{ sum += $2 } END { print sum}')" >> $distributionFile
 
-pieChartBasename=$toGrep"_pieChart
+pieChartBasename=$toGrep"_pieChart"
 Rscript $scriptsPath/percent_pie_chart.R jpeg $distributionFile $pieChartBasename | sed '/null device/d' | sed -e '/          1/d'
 Rscript $scriptsPath/percent_pie_chart.R tiff $distributionFile $pieChartBasename | sed '/null device/d' | sed -e '/          1/d'
