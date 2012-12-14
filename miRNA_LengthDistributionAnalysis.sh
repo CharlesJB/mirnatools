@@ -3,10 +3,8 @@
 id=$1
 path=$2
 
-echo id:$id
 for file in $(ls | grep $id | grep '_ID' | grep txt) 
 do
-	echo file:$file
 	tmpfile=${file%.*}".tmp"
 	cut -f2- $file | sed 's/\t/\n/g' | sort | uniq > $tmpfile
 	name=${file%_*}".fa"
