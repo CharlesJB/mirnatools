@@ -4,11 +4,11 @@
 # 2012-08-27
 
 """
-Based on the algorithm presented in: Creighton et all 2009
-usage:
+Based on the algorithm presented in: Creighton et al 2009
+Usage:
 preethi_blast_analysis.py <blast.out> <output>
-blast.out: Output of blast
-output: Prefix that will be added to output files
+    blast.out: Output of blast
+    output: Prefix that will be added to output files
 """
 
 class Entry:
@@ -397,12 +397,12 @@ class BlastAnalyzer:
 		# Print perfect matches
 		filename = output + "_perfectMatches.txt"
 		self.printCount(filename, self.perfectCounts)
-		filename = output + "_perfectSeqID.txt"
+		filename = output + "_perfectSeq_ID.txt"
 		self.printID(filename, self.perfectSeqIDs)
 		# Print loose matches
 		filename = output + "_looseMatches.txt"
 		self.printCount(filename, self.looseCounts)
-		filename = output + "_looseSeqID.txt"
+		filename = output + "_looseSeq_ID.txt"
 		self.printID(filename, self.looseSeqIDs)
 		# Print combined (loose + perfect) matches
 		filename = output + "_combinedMatches.txt"
