@@ -10,10 +10,10 @@ do
 	tmpfile=${file%.*}".tmp"
 	cut -f2- $file | sed 's/\t/\n/g' | sort | uniq > $tmpfile
 	name=${file%_*}".fa"
-	$path/getFasta.py $file $id"_UsableSeq.fasta" > $name
+	$path/getFasta.py $tmpfile $id"_UsableSeq.fasta" > $name
 	lengthDist="lengthDist_"${name%.*}".txt"
 	cat $name | $path/LengthDistribution.py 60 > $lengthDist
 	Rscript $path/PlotLengthDistribution.R $lengthDist ${file%.*}
 done
 
-rm *.tmp
+rm -f *.tmp
