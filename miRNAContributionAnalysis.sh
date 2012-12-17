@@ -28,7 +28,7 @@ numberOfSequences=$(grep '>' $usableSequences | awk '{ SUM += $4 } END { print S
 echo "		$numberOfSequences sequences."
 
 # 2. Calulate relative contribution based on total number of sequences
-for file in $(ls | grep mature | grep fa)
+for file in $(ls | grep mature | grep $id | grep fa)
 do
 	echo "	Calculating relative contribution for $file."
 #	uniqueFastaOutput=$id"_blast_ID_unique.fa"
