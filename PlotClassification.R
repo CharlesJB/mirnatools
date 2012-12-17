@@ -1,17 +1,17 @@
 # Utilitary functions
 drawLines <- function() {
-	lines(x=c(-50,-50), y=c(0,17), lty="solid", col="black")
-	lines(x=c(-40,-40), y=c(0,9.5), lty="solid", col="black")
-	lines(x=c(-40,-40), y=c(10,17), lty="solid", col="black")
+	lines(x=c(-75,-75), y=c(0,17), lty="solid", col="black")
+	lines(x=c(-55,-55), y=c(0,9.5), lty="solid", col="black")
+	lines(x=c(-55,-55), y=c(10,17), lty="solid", col="black")
 }
 
 drawText <- function(id) {
-	mainText <- pase("Classification of the small RNA species - ", id, sep="")
-	text(x=20, y=19, mainText, cex=1.3)
+	mainText <- paste("Classification of the small RNA species - ", id, sep="")
+	text(x=15, y=19, mainText, cex=1.2)
 	title(xlab="Reads mapped (%)")
-	text(x = -45, y=13.3, 'Genomic Repeats', srt=90, cex=1.1)
-	text(x = -45, y=5, 'Functional ncRNAs', srt=90, cex=1.1)
-	text(x = -55, y=8, 'RNA species', srt=90, cex=1.1)
+	text(x = -60, y=13.3, 'Genomic Repeats', srt=90, cex=1.1)
+	text(x = -60, y=5, 'Functional ncRNAs', srt=90, cex=1.1)
+	text(x = -80, y=8, 'RNA species', srt=90, cex=1.1)
 }
 
 drawPlot <- function(data, filetype, outputBasename) {
@@ -23,9 +23,9 @@ drawPlot <- function(data, filetype, outputBasename) {
 		filename = paste("classification_", outputBasename, ".tiff", sep="")
 		tiff(filename)
 	}
-	par(mai=c(1.5,4,1,1), xpd=NA)
+	par(mai=c(1.5,3,1,1), xpd=NA)
 	options(scipen = 50, digits = 10)
-	barplot(a[,1], names=row.names(a), horiz=TRUE, las=2, xlim=c(0,100))
+	barplot(data[,1], names=row.names(data), horiz=TRUE, las=2, xlim=c(0,100))
 	drawText(outputBasename)
 	drawLines()
 	dev.off()
@@ -34,7 +34,7 @@ drawPlot <- function(data, filetype, outputBasename) {
 # Main
 argv <- commandArgs(trailingOnly = T)
 
-if (length(argv) == 2) {
+if (length(argv) == 3) {
 	filename <- argv[1]
 	data <- read.table(filename, row.names=1)
 	outputBasename <- argv[2]
