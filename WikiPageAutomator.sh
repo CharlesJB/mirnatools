@@ -21,7 +21,6 @@ echo "" >> $output
 # 3. Length Distribution Analysis
 echo "== Length Distribution Analysis ==" >> $output
 figure_name=$(ls LengthDistributionAnalysis | grep $id | grep jpeg | head -n1)
-#echo "[[File:"$figure_name"|200px|Length Distribution Analysis]]" >> $output
 echo $link"/"$figure_name >> $output
 echo "" >> $output
 
@@ -63,8 +62,6 @@ do
 	echo "Number of sequences: "$count"<br/>">> $output
 	file="miRNA_"$file
 	relative="miRNA_"$relative
-#	echo "[[File:"$file"|200px|Length Distribution Analysis]]" >> $output
-#	echo "[[File:"$relative"|200px|Relative Contribution]]" >> $output
 	echo $link"/"$file >> $output
 	echo $link"/"$relative >> $output
 	echo "" >> $output
@@ -73,8 +70,6 @@ done
 echo "=== Expression Levels ===" >> $output
 pieChart=$(ls ExpressionLevels | grep $id | grep jpeg | grep pie)
 expression=$(ls ExpressionLevels | grep $id | grep jpeg | grep expressionLevels)
-#echo "[[File:"$pieChart"|200px|15 most abundant miRNAs]]" >> $output
-#echo "[[File:"$expression"|200px|Expression Levels]]" >> $output
 echo $link"/"$pieChart >> $output
 echo $link"/"$expression >> $output
 
@@ -92,8 +87,6 @@ do
 	fi
 	echo "=== "$dir" ===" >> $output
 	echo "Number of sequences: "$count"<br/>" >> $output
-#	echo "[[File:"$length"|200px|Length Distribution Analysis]]" >> $output
-#	echo "[[File:"$relative"|200px|Relative Contribution]]" >> $output
 	echo "$link/$length" >> $output
 	echo "$link/$relative" >> $output
 	echo "" >> $output
