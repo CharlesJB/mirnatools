@@ -40,5 +40,5 @@ else
 	echo "BlastAnalysis.sh <referenceData> <usableSequences> <evalue>"
 	echo "referenceData: Complete path to reference data for the blast analysis. Must be in fasta format."
 	echo "usableSequences: List of valid RNA sequence (after trimming)."
-	echo "evalue: threshold score for blast analysis."
+	echo "evalue: threshold score for blast analysis (default = 0.01)."
 fi
