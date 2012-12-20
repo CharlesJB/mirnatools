@@ -1,0 +1,9 @@
+hostname=$(hostname | cut -f1 -d'.')
+
+if [ $hostname = "ls30" ]
+then 
+	echo "[Driver] Hello, I am ls30!"
+	
+	MIRNA_TOOLS_PATH=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
+	MIRNA_TOOLS_PATH=${MIRNA_TOOLS_PATH%/*}
+fi

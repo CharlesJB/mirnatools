@@ -1,0 +1,11 @@
+
+# This script try to find a suitable driver
+# A driver just loads modules and sets paths
+# This script must be called with 'source' for the export to affect calling script.
+
+directory=$(echo ${BASH_SOURCE[0]}|sed 's=LoadModules==g')
+
+for driver in $(ls $directory/Drivers)
+do
+	source $directory/Drivers/$driver
+done
