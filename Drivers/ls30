@@ -5,5 +5,7 @@ then
 	echo "[Driver] Hello, I am ls30!"
 	
 	MIRNA_TOOLS_PATH=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
-	MIRNA_TOOLS_PATH=${MIRNA_TOOLS_PATH%/*}
+	export MIRNA_TOOLS_PATH=${MIRNA_TOOLS_PATH%/*}
+
+	export PATH=$MIRNA_TOOLS_PATH:$PATH
 fi
