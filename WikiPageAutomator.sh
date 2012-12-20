@@ -91,3 +91,17 @@ do
 	echo "$link/$relative" >> $output
 	echo "" >> $output
 done
+
+# 6. Total Contribution
+echo "== Total Annotated Contribution ==" >> $output
+length="lengthDist_total_blast_"$id".jpeg"
+relative="lengthDist_total_blast_"$id"_relative.jpeg"
+echo "$link/$length" >> $output
+echo "$link/$relative" >> $output
+echo "" >> $output
+
+# 7. small RNAs classification
+echo "== Classification of small RNA species ==" >> $output
+file="classification_"$id".jpeg"
+echo "$link/$file" >> $output
+echo "" >> $output
