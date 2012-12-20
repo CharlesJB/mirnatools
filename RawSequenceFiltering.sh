@@ -7,7 +7,7 @@ scripts_path=$3
 trim_output=$(basename $fastq_file)
 trim_output="RawSequenceFiltering/"${trim_output%.*}".trimmed.fastq"
 qual_output=${trim_output%.*}".qual.fastq"
-copy_output=${trim_output%.*}".copy.fastq"
+copy_output=${trim_output%.*}".copy.fasta"
 
 mkdir -p RawSequenceFiltering
 
