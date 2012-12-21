@@ -33,7 +33,7 @@ then
 	trim_output=$(basename $fastq_file)
 	trim_output="RawSequenceFiltering/"${trim_output%.*}".trimmed.fastq"
 	qual_output=${trim_output%.*}".qual.fastq"
-	copy_output=${trim_output%.*}".copy.fasta"
+	copy_output=${qual_output%.*}".copy.fasta"
 
 	# Do the actual analysis
 	mkdir -p RawSequenceFiltering
