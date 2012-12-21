@@ -36,7 +36,8 @@ then
 	BlastAnalysis.sh $reference $usableSequences "0.1"
 	echo "Done!"
 
-	blastOutput=$(basename ${reference%.*})".out"
+	id=${usableSequences%_*}
+	blastOutput=$(basename ${reference%.*})"_"$id".out"
 
 	echo ""
 	echo "Launching Preethi's algorithm..."
@@ -45,14 +46,13 @@ then
 
 	echo ""
 	echo "Beginning length distribution analysis..."
-	id=$(echo $(basename $usableSequences) | sed 's/_UsableSeq.fasta//g')
-	miRNA_LengthDistributionAnalysis.sh $id $scriptsPath
+	miRNA_LengthDistributionAnalysis.sh $id 
 	echo "Done!"
 
 	echo ""
 	echo "Beginning contribution analysis..."
 	baseRef=$(basename ${reference%.*})
-	miRNAContributionAnalysis.sh $id $usableSequences $scriptsPath
+	miRNAContributionAnalysis.sh $id $usableSequences
 	echo "Done!"
 
 	# Clean up
