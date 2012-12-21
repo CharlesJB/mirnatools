@@ -40,12 +40,12 @@ then
 fi
 
 pieChartBasename="ExpressionLevels/"$toGrep"_pieChart"
-Rscript $scriptsPath/percent_pie_chart.R jpeg $distributionFile $pieChartBasename | sed '/null device/d' | sed -e '/          1/d'
-Rscript $scriptsPath/percent_pie_chart.R tiff $distributionFile $pieChartBasename | sed '/null device/d' | sed -e '/          1/d'
+Rscript $scriptsPath/Rscripts/percent_pie_chart.R jpeg $distributionFile $pieChartBasename | sed '/null device/d' | sed -e '/          1/d'
+Rscript $scriptsPath/Rscripts/percent_pie_chart.R tiff $distributionFile $pieChartBasename | sed '/null device/d' | sed -e '/          1/d'
 
 # miRNA expression level graph
 absoluteCountFile="ExpressionLevels/"$(basename $file)
 expressionBasename="ExpressionLevels/"$toGrep"_expressionLevels"
 sort -k2 -nr $file > $absoluteCountFile
-Rscript $scriptsPath/profiling.R jpeg $absoluteCountFile $expressionBasename | sed '/null device/d' | sed -e '/          1/d' 
-Rscript $scriptsPath/profiling.R tiff $absoluteCountFile $expressionBasename | sed '/null device/d' | sed -e '/          1/d'
+Rscript $scriptsPath/Rscripts/profiling.R jpeg $absoluteCountFile $expressionBasename | sed '/null device/d' | sed -e '/          1/d' 
+Rscript $scriptsPath/Rscripts/profiling.R tiff $absoluteCountFile $expressionBasename | sed '/null device/d' | sed -e '/          1/d'

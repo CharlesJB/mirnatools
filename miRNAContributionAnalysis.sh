@@ -39,7 +39,7 @@ do
 	# 3. Plot the relative distribution
 	echo "	Plotting the relative distribution."
 	cat $usableSequences | $scriptsPath/LengthDistribution.py 60 > lengthDist.tmp
-	Rscript $scriptsPath/PlotRelativeLengthDistribution.R $relativeOutput lengthDist.tmp $preetiSuffix | sed '/null device/d' | sed -e '/          1/d'
+	Rscript $scriptsPath/Rscripts/PlotRelativeLengthDistribution.R $relativeOutput lengthDist.tmp $preetiSuffix | sed '/null device/d' | sed -e '/          1/d'
 done
 
 rm -f *.tmp

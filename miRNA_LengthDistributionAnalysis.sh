@@ -11,7 +11,7 @@ do
 	$path/getFasta.py $tmpfile $id"_UsableSeq.fasta" > $name
 	lengthDist="lengthDist_"${name%.*}".txt"
 	cat $name | $path/LengthDistribution.py 60 > $lengthDist
-	Rscript $path/PlotLengthDistribution.R $lengthDist ${file%.*} | sed '/null device/d' | sed -e '/          1/d'
+	Rscript $path/Rscripts/PlotLengthDistribution.R $lengthDist ${file%.*} | sed '/null device/d' | sed -e '/          1/d'
 done
 
 rm -f *.tmp
