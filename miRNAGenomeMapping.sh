@@ -46,13 +46,13 @@ then
 
 	echo ""
 	echo "Beginning length distribution analysis..."
-	miRNA_LengthDistributionAnalysis.sh $id $scriptsPath
+	miRNA_LengthDistributionAnalysis.sh $id 
 	echo "Done!"
 
 	echo ""
 	echo "Beginning contribution analysis..."
 	baseRef=$(basename ${reference%.*})
-	miRNAContributionAnalysis.sh $id $usableSequences $scriptsPath
+	miRNAContributionAnalysis.sh $id $usableSequences
 	echo "Done!"
 
 	# Clean up

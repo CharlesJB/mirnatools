@@ -2,11 +2,10 @@
 
 Usage() {
 	echo "Usage:"
-	echo "ContributionAnalysis.sh <id> <usableSequences> <scriptsPath>"
+	echo "ContributionAnalysis.sh <id> <usableSequences>"
 	echo "id: basename of the analysis file."
 	echo "usableSequences: List of valid RNA sequence (after trimming)."
-	echo "scriptsPath: path containing the miRNA-Tools git clone."
-	echo "			 (https://github.com/CharlesJB/miRNA-Tools)"
+	echo ""
 }
 
 ValidateFile() {
@@ -20,7 +19,6 @@ ValidateFile() {
 
 id=$1
 usableSequences=$2
-scriptsPath=$3
 
 # 1. Calculate total number of sequences
 echo "	Caculating total number of usable sequences."
@@ -34,12 +32,12 @@ do
 #	uniqueFastaOutput=$id"_blast_ID_unique.fa"
 	preetiSuffix=$(echo $file | sed 's/mature_//g' | sed 's/\.fa//g')
 	relativeOutput="lengthDist_"$preetiSuffix"_relative.txt"
-	cat $file | $scriptsPath/LengthDistribution.py 60 $numberOfSequences > $relativeOutput
+	cat $file | $MIRNA_TOOLS_PATH/LengthDistribution.py 60 $numberOfSequences > $relativeOutput
 
 	# 3. Plot the relative distribution
 	echo "	Plotting the relative distribution."
-	cat $usableSequences | $scriptsPath/LengthDistribution.py 60 > lengthDist.tmp
-	Rscript $scriptsPath/Rscripts/PlotRelativeLengthDistribution.R $relativeOutput lengthDist.tmp $preetiSuffix | sed '/null device/d' | sed -e '/          1/d'
+	cat $usableSequences | $MIRNA_TOOLS_PATH/LengthDistribution.py 60 > lengthDist.tmp
+	Rscript $MIRNA_TOOLS_PATH/Rscripts/PlotRelativeLengthDistribution.R $relativeOutput lengthDist.tmp $preetiSuffix | sed '/null device/d' | sed -e '/          1/d'
 done
 
 rm -f *.tmp
