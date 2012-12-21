@@ -32,7 +32,8 @@ then
 	# 4. Do the actual blast
 	echo ""
 	echo "	Doing the actual blast."
-	out=$(basename ${reference%.*}).out
+	id=${usableSequences%_*}
+	out=$(basename ${reference%.*})"_"$id".out"
 	blastn -task blastn-short -db ${input%.*} -query $usableSequences -out $out -word_size 4 -evalue $evalue -num_threads 4
 else
 	echo "Cannot find reference data: $reference"
