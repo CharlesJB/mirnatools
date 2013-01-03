@@ -181,7 +181,7 @@ class Parser:
 			if '>' in line:
 				self.setState("scoresFetched")
 			else:
-				if "hsa" in line:
+				if len(line.strip()) > 0:
 					self.fetchScore(line)
 
 		elif state == "scoresFetched":
