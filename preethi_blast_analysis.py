@@ -42,6 +42,7 @@ class Token:
 		self.data = {}
 		self.subjcts_names = []
 		self.species = {}
+		self.sequences = {}
 		self.query = Entry()
 
 	def setID(self, ID):
@@ -60,6 +61,10 @@ class Token:
 	def addSpecie(self, name, specie):
 		if name not in self.species:
 			self.species[name] = specie
+
+	def addSequence(self, name, sequence):
+		if name not in self.sequences:
+			self.sequences[name] = sequence
 
 	def setData(self, name, datatype, value):
 		if name == "Query":
@@ -89,6 +94,9 @@ class Token:
 
 	def getSpecie(self, name):
 		return self.species[name]
+
+	def getSequence(self, name):
+		return self.sequences[name]
 
 	def getNumberOfResult(self):
 		return len(self.subjcts_names)
@@ -168,6 +176,12 @@ class Parser:
 			self.setData(name, toAddStart, end)
 			self.setData(name, toAddEnd, start)
 
+	def fetchQuerySequence(self, name, line):
+		if "Query" in line:
+			tokens = line.split()
+			sequence = tokens[2]
+			self.token.addSequence(name, sequence)
+
 	def addCount(self, count):
 		self.token.addCount(count)
 
@@ -218,6 +232,7 @@ class Parser:
 				if "Query" in line:
 					name = self.token.getNames()[self.queryCount]
 					self.fetchStartEnd(name, line)
+					self.fetchQuerySequence(name, line)
 					self.setQueryState("queryStartEndFetched")
 					
 			elif queryState == "queryStartEndFetched":
@@ -249,6 +264,7 @@ class BlastAnalyzer:
 		self.output = output
 		self.perfectCounts = {}
 		self.perfectSpecies = {}
+		self.perfectSequences = {}
 		self.perfectSeqIDs = {} # The name of the sequences that blast to each miRNA
 		self.looseCounts = {}
 		self.looseSeqIDs = {} # The name of the sequences that blast to each miRNA
@@ -314,8 +330,16 @@ class BlastAnalyzer:
 			if key not in self.perfectSpecies:
 				self.perfectSpecies[key] = specie
 
+	def addQuerySequence(self, key, result, sequence):
+		if result == "perfectMatch":
+			if key not in self.perfectSequences:
+				self.perfectSequences[key] = sequence
+
 	def getSpecieName(self, key):
 		return self.perfectSpecies[key]
+
+	def getQuerySequence(self, key):
+		return self.perfectSequences[key]
 
 	def getCount(self, key, result):
 		if result == "perfectMatch":
@@ -356,9 +380,11 @@ class BlastAnalyzer:
 		count = float(token.getCount()) / float(token.getNumberOfResult())
 		name = token.getNames()[i]
 		specie = token.getSpecie(name)
+		sequence = token.getSequence(name)
 		self.addCount(name, result, count)
 		self.addSeqName(name, result, token.getID())
 		self.addSpecieName(name, result, specie)
+		self.addQuerySequence(name, result, sequence)
 
 	def addNoMatch(self, container, containerID, token, i):
 		count = float(token.getCount()) / float(token.getNumberOfResult())
@@ -424,10 +450,11 @@ class BlastAnalyzer:
 	def printReport(self):
 		filename = self.output + "_perfectMatches_summary.txt"
 		f = open(filename, 'w')
-		f.write("miRNA_ID\tSpecie\tSequence_Count\n")
+		f.write("miRNA_ID\tSpecie\tmiRNA_Sequence\tSequence_Count\n")
 		for miRNA in self.perfectCounts:
 			toPrint = miRNA
 			toPrint = toPrint + "\t" + self.getSpecieName(miRNA)
+			toPrint = toPrint + "\t" + self.getQuerySequence(miRNA)
 			toPrint = toPrint + "\t" + str(self.perfectCounts[miRNA])
 			toPrint = toPrint + '\n'
 			f.write(toPrint)
