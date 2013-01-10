@@ -6,262 +6,19 @@
 """
 Based on the algorithm presented in: Creighton et al 2009
 Usage:
-preethi_blast_analysis.py <blast.out> <output>
-    blast.out: Output of blast
-    output: Prefix that will be added to output files
+preethi_blast_analysis.py <blast.out> <output> <seq_count>
+    blast.out: Output of blast against miRBase (tested with version 19).
+    output: Prefix that will be added to output files.
+    seq_count: The number of sequences after quality trimming.
 """
 
-class Entry:
-	def __init__(self):
-		self.reset()
+from Parser_BlastOutput import *
 
-	def reset(self):
-		self.data = {}
-		self.data["length"] = 0
-		self.data["query_start"] = 0
-		self.data["query_end"] = 0
-		self.data["start"] = 0
-		self.data["end"] = 0
-		self.data["score"] = 0
-		self.data["mismatches"] = 0
-		self.data["gaps"] = 0
-
-	def setData(self, name, value):
-		self.data[name] = value
-
-	def getData(self, name):
-		return self.data[name]
-
-class Token:
-	def __init__(self):
-		self.reset()
-
-	def reset(self):
-		self.ID = ""
-		self.count = 0
-		self.data = {}
-		self.subjcts_names = []
-		self.species = {}
-		self.sequences = {}
-		self.query = Entry()
-
-	def setID(self, ID):
-		self.ID = ID
-
-	def setCount(self, count):
-		self.count = count
-	
-	def getCount(self):
-		return self.count
-
-	def addName(self, name):
-		if name not in self.subjcts_names:
-			self.subjcts_names.append(name)
-
-	def addSpecie(self, name, specie):
-		if name not in self.species:
-			self.species[name] = specie
-
-	def addSequence(self, name, sequence):
-		if name not in self.sequences:
-			self.sequences[name] = sequence
-
-	def setData(self, name, datatype, value):
-		if name == "Query":
-			self.query.setData(datatype, value)
-		else:
-			if name not in self.data:
-				self.data[name] = Entry()
-				self.addName(name)
-			self.data[name].setData(datatype, value)
-
-	def removeName(self, name):
-		self.subjcts_names.remove(name)
-		del self.data[name]
-		del self.species[name]
-
-	def getData(self, name, datatype):
-		if name == "Query":
-			return self.query.getData(datatype)
-		else:
-			return self.data[name].getData(datatype)
-	
-	def getID(self):
-		return self.ID
-	
-	def getNames(self):
-		return self.subjcts_names
-
-	def getSpecie(self, name):
-		return self.species[name]
-
-	def getSequence(self, name):
-		return self.sequences[name]
-
-	def getNumberOfResult(self):
-		return len(self.subjcts_names)
-
-class Parser:
-	def __init__ (self, filename):
-		self.f = open(filename) 
-		self.token = Token()
-		self.eof = False
-		self.state = "noEntry"
-		self.queryState = "newQuery"
-		self.queryCount = 0
-
-	def setQueryState(self, state):
-		self.queryState = state
-	
-	def getQueryState(self):
-		return self.queryState
-	
-	def setState(self, state):
-		self.state = state
-
-	def getState(self):
-		return self.state
-
-	def setData(self, name, datatype, value):
-		self.token.setData(name, datatype, value)
-
-	def newEntry(self):
-		self.token.reset()
-		self.setState("noEntry")
-		self.setQueryState("newQuery")
-		self.queryCount = 0
-
-	def fetchQueryInfos(self, line):
-		tokens = line.split()
-		self.token.setID(tokens[1])
-		self.token.setCount(int(tokens[3]))
-
-	def fetchLength(self, name, line):
-		tokens = line.split('=')
-		self.setData(name, "length", int(tokens[1]))
-
-	def fetchScore(self, line):
-		tokens = line.split()
-		name = tokens[0]
-#		score = float(tokens[5])
-		score = float(tokens[len(tokens)-2])
-		self.token.setData(name, "score", score)
-
-	def fetchSpecie(self, line):
-		tokens = line.split()
-		name = tokens[0]
-		specie = ' '.join(tokens[2:len(tokens)-3])
-		self.token.addSpecie(name, specie)
-
-	def fetchIdentitiesAndGaps(self, name, line):
-		tokens = line.split()
-		identities = str(tokens[2]).split('/')
-		self.setData(name, "mismatches", int(identities[1]) - int(identities[0]))
-		gaps = str(tokens[6]).split('/')
-		self.setData(name, "gaps", int(gaps[0]))
-
-	def fetchStartEnd(self, name, line):
-		toAddStart = "start"
-		toAddEnd = "end"
-		if "Query" in line:
-			toAddStart = "query_start"
-			toAddEnd = "query_end"
-		tokens = line.split()
-		start = int(tokens[1])
-		end = int(tokens[3])
-		if end > start:
-			self.setData(name, toAddStart, start)
-			self.setData(name, toAddEnd, end)
-		else:
-			self.setData(name, toAddStart, end)
-			self.setData(name, toAddEnd, start)
-
-	def fetchQuerySequence(self, name, line):
-		if "Query" in line:
-			tokens = line.split()
-			sequence = tokens[2]
-			self.token.addSequence(name, sequence)
-
-	def addCount(self, count):
-		self.token.addCount(count)
-
-	def parseLine(self, line):
-		state = self.getState()
-		if state == "newEntry" or state == "noEntry":
-			if state == "noEntry":
-				self.newEntry()
-				self.setState("newEntry")
-			if "Query=" in line:
-				self.fetchQueryInfos(line)   
-				self.setState("inEntry")
-		elif state == "inEntry":
-			if "Length=" in line:
-				self.fetchLength("Query", line)
-				self.setState("queryLengthFetched")
-
-		elif state == "queryLengthFetched":
-			if "No hits found" in line:
-				self.newEntry()
-
-			elif "Sequences producing" in line:
-				self.setState("hasHit")
-
-		elif state == "hasHit":
-			if '>' in line:
-				self.setState("scoresFetched")
-			else:
-				if len(line.strip()) > 0:
-					self.fetchScore(line)
-					self.fetchSpecie(line)
-
-		elif state == "scoresFetched":
-			queryState = self.getQueryState()
-			if queryState == "newQuery":
-				if "Lambda" in line: # This means end of Entry
-					self.setState("noEntry")
-				elif "Length=" in line:
-					name = self.token.getNames()[self.queryCount]
-					self.fetchLength(name, line)
-					self.setQueryState("subjctsLengthFetched")
-			elif queryState == "subjctsLengthFetched":
-				if "Identities" in line:
-					name = self.token.getNames()[self.queryCount]
-					self.fetchIdentitiesAndGaps(name, line)
-					self.setQueryState("identFetched")
-			elif queryState == "identFetched":
-				if "Query" in line:
-					name = self.token.getNames()[self.queryCount]
-					self.fetchStartEnd(name, line)
-					self.fetchQuerySequence(name, line)
-					self.setQueryState("queryStartEndFetched")
-					
-			elif queryState == "queryStartEndFetched":
-				if "Sbjct" in line:
-					name = self.token.getNames()[self.queryCount]
-					self.fetchStartEnd(name, line)
-					self.queryCount += 1
-					self.setQueryState("newQuery")
-					
-	def getToken(self):
-		return self.token
-
-	def isEOF(self):
-		return self.eof
-
-	def createNextToken(self):
-		done = False
-		while done == False and self.isEOF() == False:
-			line = self.f.readline()
-			self.parseLine(line)
-			if not line:
-				self.eof = True
-			elif self.getState() == "noEntry":
-				done = True
-   
 class BlastAnalyzer:
-	def __init__(self, filename, output):
+	def __init__(self, filename, output, total_count):
 		self.parser = Parser(filename)
 		self.output = output
+		self.total_count = float(total_count)
 		self.perfectCounts = {}
 		self.perfectSpecies = {}
 		self.perfectSequences = {}
@@ -376,11 +133,19 @@ class BlastAnalyzer:
 		else:
 			return "looseMatch"
 
+	def getShortName(self, name):
+		return name.split()[0]
+
+	def getSpecie(self, fullName):
+		tokens = fullName.split()
+		return ' '.join(tokens[2:len(tokens)-1])
+
 	def addResults(self, result, token, i):
 		count = float(token.getCount()) / float(token.getNumberOfResult())
 		name = token.getNames()[i]
-		specie = token.getSpecie(name)
-		sequence = token.getSequence(name)
+		fullName = token.getData(name, "query_fullName")
+		specie = self.getSpecie(fullName)
+		sequence = token.getData(name, "query_sequence")
 		self.addCount(name, result, count)
 		self.addSeqName(name, result, token.getID())
 		self.addSpecieName(name, result, specie)
@@ -388,7 +153,7 @@ class BlastAnalyzer:
 
 	def addNoMatch(self, container, containerID, token, i):
 		count = float(token.getCount()) / float(token.getNumberOfResult())
-		name = token.getNames()[i]
+		name = self.getShortName(token.getNames()[i])
 		ID = token.getID()
 		if name in container:
 			container[name] += count
@@ -419,7 +184,6 @@ class BlastAnalyzer:
 		done = False
 		count = 0
 		while done == False:
-#			print "====== Token: " + str(count+1) + " ======"
 			count += 1
 			self.parser.createNextToken()
 			if count % 1000 == 0:
@@ -450,12 +214,13 @@ class BlastAnalyzer:
 	def printReport(self):
 		filename = self.output + "_perfectMatches_summary.txt"
 		f = open(filename, 'w')
-		f.write("miRNA_ID\tSpecie\tmiRNA_Sequence\tSequence_Count\n")
+		f.write("miRNA_ID\tSpecie\tmiRNA_Sequence\tSequence_Count\t%_of_total\n")
 		for miRNA in self.perfectCounts:
 			toPrint = miRNA
 			toPrint = toPrint + "\t" + self.getSpecieName(miRNA)
 			toPrint = toPrint + "\t" + self.getQuerySequence(miRNA)
 			toPrint = toPrint + "\t" + str(self.perfectCounts[miRNA])
+			toPrint = toPrint + "\t" + str((self.perfectCounts[miRNA] / self.total_count) * 100)
 			toPrint = toPrint + '\n'
 			f.write(toPrint)
 		f.close()
@@ -491,13 +256,14 @@ class BlastAnalyzer:
 import sys
 
 if __name__ == "__main__":
-	if len(sys.argv) != 3:
+	if len(sys.argv) != 4:
 		print __doc__
 		sys.exit(1)
 
 	filename = sys.argv[1]
 	output = sys.argv[2]
-	blastAnalyzer = BlastAnalyzer(filename, output)
+	total_count = sys.argv[3]
+	blastAnalyzer = BlastAnalyzer(filename, output, total_count)
 	blastAnalyzer.parseFile()
 	blastAnalyzer.printAll()
 	blastAnalyzer.printReport()
