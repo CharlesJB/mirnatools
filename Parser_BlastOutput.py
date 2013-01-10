@@ -14,6 +14,7 @@ class Entry:
 	def reset(self):
 		self.data = {}
 		self.data["length"] = 0
+		self.data["query_fullName"] = ""
 		self.data["query_start"] = 0
 		self.data["query_end"] = 0
 		self.data["query_sequence"] = ""
@@ -53,31 +54,26 @@ class Token:
 	def getCount(self):
 		return self.count
 
+	def getShortName(self, name):
+		return str(name).split()[0]
+
 	def addName(self, name):
 		if name not in self.subjcts_names:
 			self.subjcts_names.append(name)
 
-	def addSpecie(self, name, specie):
-		if name not in self.species:
-			self.species[name] = specie
-
-#	def addSequence(self, name, sequence):
-#		if name not in self.sequences:
-#			self.sequences[name] = sequence
-#
 	def setData(self, name, datatype, value):
 		if name == "Query":
 			self.query.setData(datatype, value)
 		else:
-			if name not in self.data:
-				self.data[name] = Entry()
-				self.addName(name)
-			self.data[name].setData(datatype, value)
+			shortName = self.getShortName(name)
+			if shortName not in self.data:
+				self.data[shortName] = Entry()
+				self.addName(shortName)
+			self.data[shortName].setData(datatype, value)
 
 	def removeName(self, name):
 		self.subjcts_names.remove(name)
 		del self.data[name]
-		del self.species[name]
 
 	def getData(self, name, datatype):
 		if name == "Query":
@@ -90,9 +86,6 @@ class Token:
 	
 	def getNames(self):
 		return self.subjcts_names
-
-	def getSpecie(self, name):
-		return self.species[name]
 
 	def getSequence(self, name):
 		return self.sequences[name]
@@ -137,16 +130,18 @@ class Parser:
 
 	def fetchSubjctName(self, line):
 		tokens = line.split()
-		name = ' '.join(tokens[:len(tokens)-2])
+		name = tokens[0]
+		fullName = ' '.join(tokens[:len(tokens)-2])
 		self.token.addName(name)
+		self.token.setData(name, "query_fullName", fullName) 
 
 	def fetchScores(self, line):
 		tokens = line.split()
-		name = self.fetchSubjctName(line)
+		name = line.split()[0]
 		score = float(tokens[len(tokens)-2])
 		evalue = float(tokens[len(tokens)-1])
-		self.token.setData(name, "score", score)
-		self.token.setData(name, "e_value", score)
+		self.setData(name, "score", score)
+		self.setData(name, "e_value", evalue)
 
 	def parseScoreLine(self, line):
 		self.fetchSubjctName(line)
@@ -156,12 +151,12 @@ class Parser:
 		tokens = line.split('=')
 		self.setData(name, "length", int(tokens[1]))
 
-	def fetchIdentitiesAndGaps(self, name, line):
+	def fetchIdentitiesAndGaps(self, line):
 		name = self.token.getNames()[self.queryCount]
 		tokens = line.split()
 		identities = str(tokens[2]).split('/')
-		self.setData(name, "mismatches", int(identities[1]) - int(identities[0]))
 		gaps = str(tokens[6]).split('/')
+		self.setData(name, "mismatches", int(identities[1]) - int(identities[0]))
 		self.setData(name, "gaps", int(gaps[0]))
 
 	def fetchStartEnd(self, name, line):
