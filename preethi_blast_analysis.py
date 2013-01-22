@@ -13,6 +13,7 @@ preethi_blast_analysis.py <blast.out> <output> <seq_count>
 """
 
 from Library/Parser_BlastOutput import *
+from Library/SpecieConverter.py import *
 
 class BlastAnalyzer:
 	def __init__(self, filename, output, total_count):
@@ -212,12 +213,14 @@ class BlastAnalyzer:
 		f.close()
 
 	def printReport(self):
+		specieConverter = SpecieConverter()
 		filename = self.output + "_perfectMatches_summary.txt"
 		f = open(filename, 'w')
 		f.write("miRNA_ID\tSpecie\tmiRNA_Sequence\tSequence_Count\t%_of_total\n")
 		for miRNA in self.perfectCounts:
 			toPrint = miRNA
 			toPrint = toPrint + "\t" + self.getSpecieName(miRNA)
+			toPrint = toPrint + "\t" + specieConverter(self.getSpecieName(miRNA))
 			toPrint = toPrint + "\t" + self.getQuerySequence(miRNA)
 			toPrint = toPrint + "\t" + str(self.perfectCounts[miRNA])
 			toPrint = toPrint + "\t" + str((self.perfectCounts[miRNA] / self.total_count) * 100)
