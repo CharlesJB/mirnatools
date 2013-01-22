@@ -12,7 +12,7 @@ nt_blast_analysis.py <blast.out> <output> <seq_count>
     seq_count: The number of sequences after quality trimming.
 """
 
-from Parser_BlastOutput import *
+from Library/Parser_BlastOutput import *
 
 class BlastAnalyzer:
 	def __init__(self, filename, output, total_count):
