@@ -58,8 +58,9 @@ class Token:
 		return str(name).split()[0]
 
 	def addName(self, name):
-		if name not in self.subjcts_names:
-			self.subjcts_names.append(name)
+		self.subjcts_names.append(name)
+#		if name not in self.subjcts_names:
+#			self.subjcts_names.append(name)
 
 	def setData(self, name, datatype, value):
 		if name == "Query":
@@ -72,8 +73,16 @@ class Token:
 			self.data[shortName].setData(datatype, value)
 
 	def removeName(self, name):
-		self.subjcts_names.remove(name)
-		del self.data[name]
+		if self.subjcts_names.count(name) == 1:
+			self.subjcts_names.remove(name)
+			del self.data[name]
+		else:
+			isRemoved = False
+			for i in range(len(self.subjcts_names)-1, -1, -1):
+				if isRemoved == False:
+					if self.subjcts_names[i] == name:
+						self.subjcts_names.pop(i)
+						isRemoved = True
 
 	def getData(self, name, datatype):
 		if name == "Query":
@@ -92,6 +101,23 @@ class Token:
 
 	def getNumberOfResult(self):
 		return len(self.subjcts_names)
+
+	def processScores(self): # Keep only value with the top score
+		maximum = 0.0
+		# Get max value
+		keys = self.getNames()
+		for key in keys:
+			current_score = self.getData(key, "score")
+			if current_score > maximum:
+				maximum = current_score
+
+		# Remove keys that are below max score
+		toRemove = []
+		for key in keys:
+			if self.getData(key, "score") < maximum:
+				toRemove.append(key)
+		for key in toRemove:
+			self.removeName(key)
 
 class Parser:
 	def __init__ (self, filename):
@@ -125,13 +151,16 @@ class Parser:
 
 	def fetchQueryInfos(self, line):
 		tokens = line.split()
-		self.token.setID(tokens[1])
+#		self.token.setID(tokens[1])
+		self.token.setID(' '.join(line.split()[1:len(line.split())]))
 		self.token.setCount(int(tokens[3]))
 
 	def fetchSubjctName(self, line):
-		tokens = line.split()
-		name = tokens[0]
-		fullName = ' '.join(tokens[:len(tokens)-2])
+#		tokens = line.split()
+#		name = tokens[0]
+#		fullName = ' '.join(tokens[:len(tokens)-2])
+		fullName = line[1:].strip()
+		name = fullName.split()[0]
 		self.token.addName(name)
 		self.token.setData(name, "query_fullName", fullName) 
 
@@ -144,7 +173,6 @@ class Parser:
 		self.setData(name, "e_value", evalue)
 
 	def parseScoreLine(self, line):
-		self.fetchSubjctName(line)
 		self.fetchScores(line)
 
 	def fetchLength(self, name, line):
@@ -214,8 +242,10 @@ class Parser:
 				self.setState("hasHit")
 
 		elif state == "hasHit":
-			if '>' in line:
+#			if '>' in line:
+			if line[0] == '>':
 				self.setState("scoresFetched")
+				self.fetchSubjctName(line)
 			else:
 				if len(line.strip()) > 0:
 					self.parseScoreLine(line)
@@ -225,12 +255,18 @@ class Parser:
 			if queryState == "newQuery":
 				if "Lambda" in line: # This means end of Entry
 					self.setState("noEntry")
+				if len(line.strip()) > 0 and line[0] == '>':
+					self.fetchSubjctName(line)
 				elif "Length=" in line:
+#					print "self.queryCount: " + str(self.queryCount)
+#					print "len(self.token.getNames()): " + str(len(self.token.getNames()))
 					name = self.token.getNames()[self.queryCount]
+#					print "name: " + str(name)
 					self.fetchLength(name, line)
 					self.setQueryState("subjctsLengthFetched")
 			elif queryState == "subjctsLengthFetched":
 				if "Identities" in line:
+#					print "Identities"
 					self.fetchIdentitiesAndGaps(line)
 					self.setQueryState("identFetched")
 			elif queryState == "identFetched":
