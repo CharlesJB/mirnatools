@@ -12,7 +12,25 @@ nt_blast_analysis.py <blast.out> <output> <seq_count>
     seq_count: The number of sequences after quality trimming.
 """
 
-from Library/Parser_BlastOutput import *
+from Parser_BlastOutput import *
+from SpecieConverter import *
+
+class NameParser:
+	def __init__(self):
+		self.m_nameList = []
+		self.loadNames()
+
+	def loadNames(self):
+		for line in open("DataStore/nt_names.ds"):
+			if line not in self.m_nameList:
+				self.m_nameList.append(line.strip().lower())
+
+	# Check for name that is a substring of stringToParse
+	# Not case sensitive
+	def checkNameInString(self, stringToParse):
+		for name in self.m_nameList:
+			if name in stringToParse.lower():
+				return name.capitalize()
 
 class BlastAnalyzer:
 	def __init__(self, filename, output, total_count):
@@ -138,11 +156,16 @@ class BlastAnalyzer:
 				done = True
 
 	def printReport(self):
+		nameParser = NameParser()
+		specieConverter = SpecieConverter()
 		filename = self.output + "_perfectMatches_summary.txt"
 		f = open(filename, 'w')
-		f.write("ID\tSequence\tcount\t%_of_total\n")
+		f.write("ID\tShort_ID\tCommon_name\tSequence\tcount\t%_of_total\n")
 		for ID in self.perfectCounts:
 			toPrint = self.perfectFullName[ID]
+			shortName = str(nameParser.checkNameInString(self.perfectFullName[ID]))
+			toPrint = toPrint + "\t" + shortName
+			toPrint = toPrint + "\t" + str(specieConverter.convertSpecieName(shortName))
 			toPrint = toPrint + "\t" + self.getQuerySequence(ID)
 			toPrint = toPrint + "\t" + str(self.perfectCounts[ID])
 			toPrint = toPrint + "\t" + str((self.perfectCounts[ID] / self.total_count) * 100)

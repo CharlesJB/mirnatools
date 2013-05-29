@@ -44,6 +44,13 @@ class Token:
 		self.species = {}
 		self.sequences = {}
 		self.query = Entry()
+		self.reverse_complement = False
+
+	def setReverseComplement(self, value):
+		self.reverse_complement = value
+
+	def getReverseComplementTagValue(self):
+		return self.reverse_complement
 
 	def setID(self, ID):
 		self.ID = ID
@@ -186,6 +193,9 @@ class Parser:
 		gaps = str(tokens[6]).split('/')
 		self.setData(name, "mismatches", int(identities[1]) - int(identities[0]))
 		self.setData(name, "gaps", int(gaps[0]))
+	
+	def setReverseComplementTag(self):
+		self.token.setReverseComplement(True)
 
 	def fetchStartEnd(self, name, line):
 		if "Query" in line:
@@ -198,6 +208,7 @@ class Parser:
 		start = int(tokens[1])
 		end = int(tokens[3])
 		if end > start:
+			self.setReverseComplementTag()
 			self.setData(name, toAddStart, start)
 			self.setData(name, toAddEnd, end)
 		else:

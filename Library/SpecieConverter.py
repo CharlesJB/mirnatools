@@ -14,20 +14,22 @@ The default DataStore is DataStore/speciesConversion.ds
 class SpecieConverter:
 	def __init__(self):
 		self.reset()
+		self.loadDataStore("DataStore/speciesConversion.ds")
 
 	def reset(self):
-		m_speciesList = {}
+		self.m_speciesList = {}
 
 	def loadDataStore(self, pathToDataStore):
 		for line in open(pathToDataStore):
-			binomialName = line.strip().split()[0].lower()
-			commonName = line.strip().split()[1]
-			if binomial not in m_speciesList:
-				m_speciesList[binomialName] = commonName
+			binomialName = ' '.join(line.strip().split()[0:2]).lower()
+			commonName = ' '.join(line.strip().split()[2:])
+			if binomialName not in self.m_speciesList:
+				self.m_speciesList[binomialName] = commonName
 
 	def loadAlternativeDataStore(self, pathToDataStore):
 		self.reset()
 		self.loadDataStore(pathToDataStore)
 
 	def convertSpecieName(self, binomialName):
-		return m_speciesList[binomialName.lower()]
+		if binomialName.lower() in self.m_speciesList:
+			return self.m_speciesList[binomialName.lower()]

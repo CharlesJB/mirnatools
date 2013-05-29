@@ -12,8 +12,8 @@ preethi_blast_analysis.py <blast.out> <output> <seq_count>
     seq_count: The number of sequences after quality trimming.
 """
 
-from Library/Parser_BlastOutput import *
-from Library/SpecieConverter.py import *
+from Parser_BlastOutput import *
+from SpecieConverter import *
 
 class BlastAnalyzer:
 	def __init__(self, filename, output, total_count):
@@ -220,7 +220,7 @@ class BlastAnalyzer:
 		for miRNA in self.perfectCounts:
 			toPrint = miRNA
 			toPrint = toPrint + "\t" + self.getSpecieName(miRNA)
-			toPrint = toPrint + "\t" + specieConverter(self.getSpecieName(miRNA))
+			toPrint = toPrint + "\t" + str(specieConverter.convertSpecieName(self.getSpecieName(miRNA)))
 			toPrint = toPrint + "\t" + self.getQuerySequence(miRNA)
 			toPrint = toPrint + "\t" + str(self.perfectCounts[miRNA])
 			toPrint = toPrint + "\t" + str((self.perfectCounts[miRNA] / self.total_count) * 100)

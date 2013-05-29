@@ -3,6 +3,7 @@ Acyrthosiphon pisum	Pea aphid
 Anopheles gambiae	Mosquitoe
 Bos taurus	Cow
 Canis familiaris	Dog
+Canis lupus	Gray wolf
 Cricetulus griseus	Chinese hamster
 Culex quinquefasciatus	Southern house mosquito
 Cyprinus carpio	 Common carp
@@ -19,3 +20,257 @@ Sarcophilus harrisii	Tasmanian devil
 Sus scrofa	Wild boar
 Taeniopygia guttata	 Zebra Finch
 Tetraodon nigroviridis	Pufferfish
+Xenopus tropicalis	Western clawed frog
+xenopus (silurana) tropicalis	Western clawed frog
+Xenopus laevis	African clawed frog
+Tetranychus urticae	Red spider mite
+Tribolium castaneum	Red flour beetle
+Saguinus labiatus	White-lipped tamarin
+Saccoglossus kowalevskii	Acorn worms
+Pan troglodytes	Chimpanzee
+Pongo pygmaeus	Bornean orangutan
+Pristionchus pacificus	Nematode
+Pan paniscus	Bonobo
+Paralichthys olivaceus	Olive flounder
+Ovis aries	Sheep
+Nasonia vitripennis	Wasp
+Nasonia longicornis	Wasp
+Nasonia giraulti	Wasp
+Macaca nemestrina	Southern pig-tailed macaque
+Macaca mulatta	Rhesus macaque
+Monodelphis domestica	Gray short-tailed opossum
+Locusta migratoria	Migratory locust
+Lagothrix lagotricha	Brown woolly monkey
+Lottia gigantea	Owl limpet
+Lemur catta	Ring-tailed lemur
+Ixodes scapularis	Deer tick
+Herpes Simplex	Herpes
+Gorilla gorilla	Gorilla
+Heliconius melpomene	Postman Butterfly
+Gallus gallus	Chicken
+Echinococcus multilocularis	Tapeworm
+Echinococcus granulosus	Hydatid worm
+Drosophila yakuba	Fly
+Drosophila willistoni	Fly
+Drosophila virilis	Fly
+Drosophila simulans	Fly
+Drosophila sechellia	Fly
+Daphnia pulex	Water Flea
+Drosophila pseudoobscura	Fly
+Drosophila persimilis	Fly
+Drosophila mojavensis	Fly
+Drosophila melanogaster	Fly
+Drosophila grimshawi	Fly
+Drosophila erecta	Fly
+Drosophila ananassae	Fly
+Capitella teleta	Polychaete worm
+Ciona savignyi	Sea Squirt
+Caenorhabditis remanei	Nematode
+Aedes aegypti	Yellow fever mosquito
+Anolis carolinensis	Lizard
+Apis mellifera	European honey bee
+Ascaris suum	Large roundworm of pigs
+Ateles geoffroyi	Geoffroy's spider monkey
+Bombyx mori	Domesticated silkmoth
+Branchiostoma floridae	Lancelet
+Brugia malayi	Nematode
+Caenorhabditis briggsae	Nematode
+Caenorhabditis elegans	Nematode
+Ciona intestinalis	Sea Squirt
+Oikopleura dioica	Sea Squirt
+Strongylocentrotus purpuratus	Purple sea urchin
+Arabidopsis lyrata	Flowering Plant
+Arabidopsis thaliana	Flowering Plant
+Arachis hypogaea	Peanut
+Brachypodium distachyon	Grass
+Brassica napus	Canola
+Citrus sinensis	Orange
+Citrus trifoliata	Trifoliate Orange
+Cucumis melo	Melon
+Cynara cardunculus	Artichoke thistle
+Digitalis purpurea	Foxglove
+Festuca arundinacea	Grass
+Glycine max	Soybean
+Gossypium hirsutum	Mexican cotton
+Helianthus annuus	Sunflower
+Helianthus argophyllus	Sunflower
+Helianthus tuberosus	Sunflower
+Hordeum vulgare	Barley
+Malus domestica		Apple
+Medicago truncatula	Barrel Medic
+Nicotiana tabacum	Tobacco
+Oryza sativa	Asian rice
+Physcomitrella patens	Moss
+Populus trichocarpa	Black cottonwood
+Ricinus communis	Castor oil plant
+Saccharum officinarum	Sugar Cane
+Saccharum ssp.	Sugar Cane
+Salvia sclarea	Clary sage
+Sorghum bicolor	Sorghum
+Theobroma cacao	Cacao tree
+Triticum aestivum	Bread wheat
+Vigna unguiculata	Cowpea
+Vitis vinifera	Common Grape Vine
+Zea mays	Maize
+Acanthopagrus butcheri	Southern black bream (fish)
+Afurcagobius tamarensis	Tamar River goby (fish)
+Aldrichetta forsteri	Yellow-eye mullet (fish)
+Ambassis agassizii	Agassiz's perchlet (fish)
+Ammotretis rostratus	Righteye flounders (fish)
+Anguilla japonica	Japanese eel
+Arenigobius bifrenatus	Gobies (fish)
+Arripis truttaceus	Western Australian salmon
+Bidyanus welchi	Welch's grunter (fish)
+Bubalus bubalis	Water buffalo
+Budorcas taxicolor	Takin (goat)
+Chlorocebus aethiops	Grivet (monkey)
+Crocuta crocuta	Spotted hyena
+Dicentrarchus labrax	European seabass
+Epinephelus bruneus	Grouper (fish)
+Gadus morhua	Atlantic cod (fish)
+Galaxias maculatus	Common galaxias (fish)
+Galaxias olidus	Mountain galaxias (fish)
+Hyporhamphus regularis	Halfbeaks (fish)
+Hypseleotris compressa	Sleeper gobies (fish)
+Hypseleotris galii	Sleeper gobies (fish)
+Leiopotherapon unicolor	Spangled grunter (fish)
+Liza argentea	Flat-tail mullet (fish)
+Macaca fascicularis	Crab-eating macaque
+Maccullochella ikei	Eastern freshwater cod (fish)
+Maccullochella peelii	Murray cod (fish)
+Macquaria ambigua	Golden perch (fish)
+Macquaria australasica	Macquarie perch (fish)
+Macquaria colonorum	Estuary perch (fish)
+Macquaria novemaculeata	Australian bass (fish)
+Meleagris gallopavo	Wild Turkey
+Mogurnda adspersa	Purple-spotted gudgeon (fish)
+Abudefduf saxatilis	Sergeant Major (fish)
+Ailuropoda melanoleuca	Panda
+Anguilla australis	Short-finned eel
+Anguilla luzonensis	Philippine mottled eel
+Anguilla reinhardtii	Speckled longfin eel
+Apis florea	Dwarf honey bee
+Argyrosomus hololepidotus	Madagascar meagre (fish)
+Aristichthys nobilis	Bighead carp (fish)
+Ateles belzebuth	White-fronted spider monkey
+Belisarius xambeui	Scorpion
+Bidyanus bidyanus	Silver Perch (fish)
+Callithrix jacchus	Common marmoset (monkey)
+Callorhinchus milii	Elephant shark
+Carassius carassius	Crucian carp (fish)
+Catla catla	Indian Carp (fish)
+Cirrhinus mrigala	Mrigal carp (fish)
+Colossoma macropomum	Tambaqui (fish)
+Damon gracilis	Arachnid
+Damon johnstonii	Arachnid
+Damon medius	Arachnid
+Deltistes luxatus	Lost River Sucker (fish)
+Gadopsis bispinosus	Two-spined blackfish (fish)
+Gadopsis marmoratus	Giver blackfish (fish)
+Galaxias brevipinnis	Climbing galaxias (fish)
+Galaxias fuscus	Mountain galaxias (fish)
+Galaxias rostratus	Flathead galaxias (fish)
+Galaxias truttaceus	Spotted galaxias (fish)
+Gambusia holbrooki	Eastern mosquitofish (fish)
+Gobiocypris rarus	Cyprinid fish
+Gobiomorphus cotidianus	Common bully (fish)
+Heterometrus cyaneus	Scorpion
+Heterometrus laoticus	Scorpion
+Heterophrynus alces	Scorpion
+Hyperlophus vittatus	Glassies (fish)
+Hypseleotris klunzingeri	Western carp gudgeon (fish)
+Pongo abelii	Sumatran orangutan
+Nyctereutes procyonoides	Raccoon dog
+Pelodiscus sinensis	Chinese softshell turtle
+Oryctolagus cuniculus	European rabbit
+Pseudacris regilla      Pacific Tree Frog
+Paralichthys adspersus	Fine flounder (fish)
+Retropinna tasmanica	Tasmanian smelt (fish)
+Retropinna semoni	Australian smelt (fish)
+Philypnodon macrostomus Sleeper gobie (fish)
+Philypnodon grandiceps	Big Headed gudgeon (fish)
+Oxyeleotris lineolata	Sleepy cod (fish)
+Nannoperca variegata	Golden pygmy perch (fish)    
+Nannoperca obscura	Yarra pygmy perch (fish)
+Nannoperca australis	Southern pygmy perch (fish)
+Tasmanogobius lasti	Lagoon goby (fish)
+Rhombosolea tapirina	Greenback flounder (fish)
+Pseudogobius olorum	Swan river goby (fish)
+Mugil cephalus	Flathead mullet (fish)
+Salmo trutta	Brown trout (fish)
+Salmo salar	Atlantic salmon (fish)
+Retropinna semoni	Australian smelt (fish)
+Philypnodon macrostomus 	Dwarf Flathead Gudgeon (fish)
+Nannoperca obscura	Yarra Pygmy Perch (fish)
+Retropinna semoni	Australian smelt (fish)       
+Pseudaphritis urvillii	Congolli (fish)
+Philypnodon grandiceps	Flathead Gudgeon (fish)  
+Perca fluviatilis	European perch (fish)
+Oncorhynchus mykiss	Rainbow trout (fish)
+Saimiri boliviensis	Black-headed Squirrel Monkey 
+Papio anubis	Olive Baboon 
+Nomascus leucogenys	White-cheeked Crested Gibbon
+Amphisamytha bioculata	Polychaetes
+Anobothrus gracilis	Polychaetes
+Apocheiridium reddelli	Scorpion
+Argiope bruennichi	Wasp spider
+Beierochelifer peloponnesiacus	Arachnid
+Bowerbankia gracilis	Bryozoan
+Bowerbankia imbricata	Bryozoan
+Callopora dumerilii	Bryozoan
+Callopora lineata	Bryozoan
+Capra hircus	Domestic goat
+Cavia porcellus	Guinea pig
+Celleporina hassallii	Marine Specie
+Chernes hahnii	Marine Specie
+Chironomus tepperi	Fly
+Clathrina adusta	Sponge
+Clathrina helveola	Sponge
+Clathrina luteoculcitella	Sponge
+Clathrina wistariensis	Sponge
+Conopeum reticulum	Bryozoan
+Cristatella mucedo	Bryozoan
+Cryptosula pallasiana	Bryozoan
+Eclysippe vanelli	Marine Specie
+Euscorpius flavicaudis	European yellow-tailed scorpion
+Fredericella sultana	Bryozoan
+Grantiopsis cylindrica	Marine Specie
+Grantiopsis heroni	Marine Specie
+Grosphus flavopiceus	Scorpion
+Ictidomys tridecemlineatus	Thirteen-lined ground squirrel
+Kudoa lateolabracis	Marine Specie
+Kudoa septempunctata	Marine Specie
+Kudoa thyrsites	Marine Specie
+Lamprochernes savignyi	Marine Specie
+Lelapiella incrustans	Marine Specie
+Leucaltis clathria	Marine Specie
+Leucandra nicolae	Marine Specie
+Leucascandra caveolata	Marine Specie
+Leucetta chagosensis	Marine Specie
+Leucetta microraphis	Marine Specie
+Leucetta villosa	Marine Specie
+Levinella prolifera	Marine Specie
+Liocheles australasiae	Scorpion
+Lophopus crystallinus	Bellflower (Marine Specie)
+Lychas mucronatus	Scorpion
+Albugo laibachii	White rust specialised to Arabidopsis species
+Ashbya gossypii	Fungus
+Cherax quadricarinatus	Australian red claw crayfish (lobster)
+Coptotermes formosanus	Formosan subterranean termite
+Cryptococcus neoformans	Yeast
+Ectopistes migratorius	Passenger Pigeon
+Felis nigripes	Black-footed Cat
+Felis silvestris	Wild cat
+Gossypium herbaceum	Levant cotton
+Haliotis midae	Large sea snail
+Hottentotta judaicus	Scorpion
+Leptosphaeria maculans	Fungus
+Litopenaeus vannamei	Shrimp
+Lotus japonicus	Wild legume
+Pandinus cavimanus	Scorpion
+Rana amurensis	Siberian Tree Frog
+Rana andersonii	Frog
+Schistosoma mansoni	Worm
+Sporisorium reilianum	Plant pathogen
+Tetrapisispora blattae	Yeast
+Trypanosoma vivax	Parasitic flagellate protozoa
