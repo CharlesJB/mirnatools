@@ -11,7 +11,8 @@ preethi_blast_analysis.py <blast.out> <output> <seq_count>
     output: Prefix that will be added to output files.
     seq_count: The number of sequences after quality trimming.
 """
-
+#import os, sys
+#sys.path.append(os.path.join(os.path.dirname(__file__), "lib"))
 from Library/Parser_BlastOutput import *
 from Library/SpecieConverter.py import *
 
