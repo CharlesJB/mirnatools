@@ -1,0 +1,81 @@
+
+## Prepare analysis
+
+# Filtering variables
+DIR_FILTERING=RawSequenceFiltering
+
+FILE_BASE=$(DIR_DATA)/$(BASE).fastq
+FILE_TRIM_FASTQ=$(DIR_FILTERING)/$(BASE)_trimmed.fastq
+FILE_TRIM_FASTA=$(DIR_FILTERING)/$(BASE)_trimmed.fasta
+FILE_TRIM_STATS=$(DIR_FILTERING)/TrimmingStats.txt
+
+SCRIPT_ADAPTOR=$(DIR_SCRIPTS)/Utility/AdaptorFinder.py
+SCRIPT_QUALITY=$(DIR_SCRIPTS)/Utility/QualityFilter.py
+SCRIPT_DUPLICATE=$(DIR_SCRIPTS)/Utility/DuplicateMerger.py
+SCRIPT_FASTQ_STATS=$(DIR_SCRIPTS)/Utility/FastqStats.py
+SCRIPT_FASTA_STATS=$(DIR_SCRIPTS)/Utility/FastaStats.py
+
+# Alignment variables
+DIR_ALIGNMENT=Alignment
+DIR_REFERENCE=reference
+FILE_ALIGNED=$(DIR_ALIGNMENT)/$(BASE).bam
+FILE_ALIGNED_INTERMEDIATE=$(DIR_ALIGNMENT)/$(BASE).sai
+FILE_REFERENCE=$(DIR_REFERENCE)/reference.fasta
+
+FILES_REFERENCE_INDEXED=$(FILE_REFERENCE).amb
+FILES_REFERENCE_INDEXED+= $(FILE_REFERENCE).ann
+FILES_REFERENCE_INDEXED+= $(FILE_REFERENCE).bwt
+FILES_REFERENCE_INDEXED+= $(FILE_REFERENCE).pac
+FILES_REFERENCE_INDEXED+= $(FILE_REFERENCE).sa
+
+# Build directory structure
+
+$(shell mkdir -p Meta)
+$(shell mkdir -p $(DIR_FILTERING))
+$(shell mkdir -p $(DIR_REFERENCE))
+$(shell mkdir -p $(DIR_ALIGNMENT))
+
+## Start Analysis
+
+# Alignment
+
+$(FILE_ALIGNED): $(FILE_ALIGNED_INTERMEDIATE)
+	bwa samse $(FILE_REFERENCE) $(FILE_ALIGNED_INTERMEDIATE) $(FILE_TRIM_FASTQ) | samtools view -bSh - > $@
+	bwa 3>&1 1>&2- 2>&3- | head -n5 > Meta/bwa.txt
+	samtools 3>&1 1>&2- 2>&3- | head -n4 > Meta/samtools.txt
+
+$(FILE_ALIGNED_INTERMEDIATE): $(FILE_TRIM_FASTQ) $(FILES_REFERENCE_INDEXED) $(FILE_REFERENCE)
+	bwa aln -l 10 -d 0 -i 0 $(FILE_REFERENCE) $(FILE_TRIM_FASTQ) > $(DIR_ALIGNMENT)/$(BASE).sai
+	bwa 3>&1 1>&2- 2>&3- | head -n5 > Meta/bwa.txt
+
+$(FILES_REFERENCE_INDEXED): $(FILE_REFERENCE)
+	bwa index $<
+	bwa 3>&1 1>&2- 2>&3- | head -n5 > Meta/bwa.txt
+
+$(FILE_REFERENCE): $(BASE_REFERENCE)
+	ln -s ../$(BASE_REFERENCE) $@
+
+#$(FILE_ALIGNED): $(FILE_TRIM_FASTQ) $(FILES_REFERENCE_INDEXED) $(FILE_REFERENCE) $(BWA) $(SAMTOOLS)
+#	bwa mem $(FILE_REFERENCE) $(FILE_TRIM_FASTQ) | samtools view -bSh - > $@
+#	bwa 3>&1 1>&2- 2>&3- | tail -n+2 | head -n4 > Meta/bwa.txt
+#	samtools 3>&1 1>&2- 2>&3- | tail -n+2 | head -n3 > Meta/samtools.txt
+#
+#$(FILES_REFERENCE_INDEXED): $(FILE_REFERENCE)
+#	bwa index $<
+#	bwa 3>&1 1>&2- 2>&3- | tail -n+2 | head -n4 > Meta/bwa.txt
+
+# Trimming
+$(FILE_TRIM_FASTA): $(FILE_TRIM_FASTQ) $(SCRIPT_DUPLICATE) $(SCRIPT_FASTA_STATS)
+	cat $< | $(SCRIPT_DUPLICATE) 4 | $(SCRIPT_FASTA_STATS) $(FILE_TRIM_STATS) "After collapsing duplicated sequences" > $@
+	$(SCRIPT_DUPLICATE) version >> Meta/Trimming.txt
+	$(SCRIPT_FASTA_STATS) version >> Meta/Trimming.txt
+
+$(FILE_TRIM_FASTQ): $(FILE_BASE) $(SCRIPT_ADAPTOR) $(SCRIPT_QUALITY) $(SCRIPT_FASTQ_STATS)
+	rm -f $(FILE_TRIM_STATS)
+	cat $< | $(SCRIPT_FASTQ_STATS) $(FILE_TRIM_STATS) "Before trimming" \
+	| $(SCRIPT_ADAPTOR) $(ADAPTOR) 3 2 | $(SCRIPT_FASTQ_STATS) $(FILE_TRIM_STATS) "After removing adaptors" \
+	| $(SCRIPT_QUALITY) 9 | $(SCRIPT_FASTQ_STATS) $(FILE_TRIM_STATS) "After quality filtering" \
+	> $@
+	$(SCRIPT_ADAPTOR) version > Meta/Trimming.txt
+	$(SCRIPT_QUALITY) version >> Meta/Trimming.txt
+	$(SCRIPT_FASTQ_STATS) version >> Meta/Trimming.txt

@@ -1,0 +1,68 @@
+#!/bin/bash
+VERSION=0.1
+
+Usage(){
+	echo ""
+	echo "This command will create the directory structure and prepare all the makefiles."
+	echo "Input file should be in fastq format and be in a directory named \"data\" in the current directory."
+	echo ""
+	echo "Usage:"
+	echo "    miRNA-Tools init [command]"
+	echo ""
+	echo "Available commands:"
+	echo "    usage"
+	echo "    version"
+	echo ""
+}
+
+dir_data=data
+dir_scripts=$1
+dir_results=results
+file_config=config.txt
+
+# Parse Arguments
+if [ "$2" == "version" ]
+then
+	echo "miRNA-Tools init v$VERSION"
+	exit
+elif [ "$#" -gt 1 ]
+then
+	Usage
+	exit
+fi
+
+# Check data directory
+if [ ! -d "$dir_data" ]
+then
+	echo ""
+	echo "Cannot find data directory."
+	Usage
+	exit
+fi
+
+# Create the directory structure and the Makefiles
+rm -f Makefile
+for file in $(ls $dir_data)
+do
+	# Create the subdirectory for the current file
+	subdirectory=$dir_results/$(basename ${file%.*})
+	mkdir -p $subdirectory/data
+	ln -sf ../../../$dir_data/$(basename $file) $subdirectory/data/$(basename ${file%.*}.fastq)
+
+	# Create the Makefile for the subdirectory
+	base=$(basename ${file%.*})
+
+	echo "BASE=$base" > $subdirectory/Makefile
+	echo "DIR_DATA=data" >> $subdirectory/Makefile
+	echo "DIR_SCRIPTS=$dir_scripts" >> $subdirectory/Makefile
+	echo "ADAPTOR=$(grep adaptor $file_config | cut -f2 | tail -n1)" >> $subdirectory/Makefile
+	echo "BASE_REFERENCE=../../$(grep reference $file_config | cut -f2 | tail -n1)" >> $subdirectory/Makefile
+	cat $dir_scripts/Templates/Makefile_SubDirectories_Template >> $subdirectory/Makefile
+
+	# Add the subdirectory to main Makefile
+	echo SUBDIRS+=$subdirectory >> Makefile
+done
+
+# Complete the main Makefile
+echo "" >> Makefile
+cat $dir_scripts/Templates/Makefile_MainDirectory_Template >> Makefile
