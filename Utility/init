@@ -168,11 +168,15 @@ do
 
 	# Complete the subdirectory Makefile
 	echo "" >> $subdirectory/Makefile
+	echo "FILE_IMAGE=$dir_mapping/mapping.tiff" >> $subdirectory/Makefile
 	echo "FILE_SUMMARY=$dir_mapping/summary.txt" >> $subdirectory/Makefile
 	echo "TARGETS=$targets \$(FILE_SUMMARY)" >> $subdirectory/Makefile
 	echo "" >> $subdirectory/Makefile
 	echo ".PHONY: all" >> $subdirectory/Makefile
-	echo "all: \$(TARGETS)" >> $subdirectory/Makefile
+	echo "all: \$(TARGETS) \$(FILE_IMAGE)" >> $subdirectory/Makefile
+	echo "" >> $subdirectory/Makefile
+	echo "\$(FILE_IMAGE): \$(FILE_SUMMARY)" >> $subdirectory/Makefile
+        echo -e "\tRscript \$(DIR_SCRIPTS)/Rscripts/GenomeMapping.R \$(FILE_SUMMARY) \$@" >> $subdirectory/Makefile
 	echo "" >> $subdirectory/Makefile
 	echo "\$(FILE_SUMMARY): \$(TARGETS_BAM) \$(TARGET_FASTA)" >> $subdirectory/Makefile
         echo -e "\techo -e \"RNA_specie\tCount\" > \$(FILE_SUMMARY)" >> $subdirectory/Makefile
