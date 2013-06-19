@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION=0.1
+VERSION=0.2
 
 # http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 dir_scripts="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -10,8 +10,8 @@ Usage(){
 	echo "miRNA-Tools [command]"
 	echo ""
 	echo "Available commands:"
-	echo "    init	initialize current directory"
-	echo "    version	show tool version"
+	echo "    init"
+	echo "    version"
 	echo ""
 }
 

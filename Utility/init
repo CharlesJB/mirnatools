@@ -1,5 +1,4 @@
 #!/bin/bash
-VERSION=0.1
 
 Usage(){
 	echo ""
@@ -10,59 +9,176 @@ Usage(){
 	echo "    miRNA-Tools init [command]"
 	echo ""
 	echo "Available commands:"
+	echo "    all (default)"
+	echo "    filtering"
+	echo "    mapping"
 	echo "    usage"
-	echo "    version"
 	echo ""
 }
 
-dir_data=data
-dir_scripts=$1
-dir_results=results
-file_config=config.txt
+CreateDir(){
+	directory=$1
+	if [ ! -d $directory ]
+	then
+		mkdir -p $directory
+	fi
+}
 
-# Parse Arguments
-if [ "$2" == "version" ]
-then
-	echo "miRNA-Tools init v$VERSION"
-	exit
-elif [ "$#" -gt 1 ]
+dir_data=data
+dir_results=.
+dir_filtering=RawSequenceFiltering
+dir_mapping=GenomeMapping
+file_configuration=config.txt
+
+# Parse arguments
+if [ "$#" -gt 2 ]
 then
 	Usage
 	exit
 fi
+dir_scripts=$1
+command=$2
+if [ "$command" == "" ]
+then
+	command="all"
+fi
 
-# Check data directory
-if [ ! -d "$dir_data" ]
+# Check arguments
+if [ ! -d "$dir_scripts" ]
 then
 	echo ""
-	echo "Cannot find data directory."
+	echo "Cannot find scripts directory: $dir_scripts."
+	Usage
+	exit
+elif [ ! -e "$file_configuration" ]
+then
+	echo ""
+	echo "Please create a configuration file before the analysis (see: Docs/configuration_file.txt)."
+	exit
+elif [ ! -d "$dir_data" ]
+then
+	echo ""
+	echo "Cannot find data directory (see: README)."
 	Usage
 	exit
 fi
 
-# Create the directory structure and the Makefiles
-rm -f Makefile
+# Start the real work
+main_makefile=Makefile
+# Reset main directory's Makefile
+rm -f $main_makefile
+
 for file in $(ls $dir_data)
 do
+	echo "-------------------"
+	echo $file
+	echo ""
 	# Create the subdirectory for the current file
+	targets=""
 	subdirectory=$dir_results/$(basename ${file%.*})
-	mkdir -p $subdirectory/data
-	ln -sf ../../../$dir_data/$(basename $file) $subdirectory/data/$(basename ${file%.*}.fastq)
-
-	# Create the Makefile for the subdirectory
-	base=$(basename ${file%.*})
-
-	echo "BASE=$base" > $subdirectory/Makefile
-	echo "DIR_DATA=data" >> $subdirectory/Makefile
-	echo "DIR_SCRIPTS=$dir_scripts" >> $subdirectory/Makefile
-	echo "ADAPTOR=$(grep adaptor $file_config | cut -f2 | tail -n1)" >> $subdirectory/Makefile
-	echo "BASE_REFERENCE=../../$(grep reference $file_config | cut -f2 | tail -n1)" >> $subdirectory/Makefile
-	cat $dir_scripts/Templates/Makefile_SubDirectories_Template >> $subdirectory/Makefile
 
 	# Add the subdirectory to main Makefile
-	echo SUBDIRS+=$subdirectory >> Makefile
+	echo SUBDIRS+=$subdirectory >> $main_makefile 
+
+	# Create the subdirectory Makefile
+	echo "DIR_SCRIPTS=$dir_scripts" > $subdirectory/Makefile
+
+	if [ "$command" == "filtering" ] || [ "$command" == "all" ]
+	then
+		echo "filtering"
+#		mkdir -p $subdirectory/$dir_filtering
+		CreateDir $subdirectory/$dir_filtering
+		adaptor=$(grep adaptor $file_configuration | cut -f2 | tail -n1)
+
+		# Prepare filtering subdirectory Makefile
+		echo "include filtering.mk" >> $subdirectory/Makefile
+		targets+=" filtering"
+
+		# Prepare the filtering Makefile configuration file
+		echo "DIR_SCRIPTS=$dir_scripts" > $subdirectory/filtering.mk
+		echo "ADAPTOR=$adaptor" >> $subdirectory/filtering.mk
+		echo "FILE_DATA=../$dir_data/$file" >> $subdirectory/filtering.mk
+		tail -n+5 $dir_scripts/Templates/Makefile_RawSequenceFiltering_Template >> $subdirectory/filtering.mk
+	fi
+
+	if [ "$command" == "mapping-miRNA" ] || [ "$command" == "mapping" ] || [ "$command" == "all" ]
+	then
+		echo "mapping-miRNA"
+		subdir_reference=$subdirectory/reference
+#		mkdir -p $subdir_reference
+		CreateDir $subdir_reference
+		# Prepare the directory structure
+#		mkdir -p $subdirectory/$dir_mapping
+		CreateDir $subdirectory/$dir_mapping
+		dir_reference_miRNA=$(grep dir_reference_miRNA $file_configuration | cut -f2 | tail -n1)
+		reference=$(find $dir_reference_miRNA/* | head -n1)
+		cat $reference | $dir_scripts/Utility/convertRNAfastaToDNA.py > $subdir_reference/$(basename ${reference%.*}).fasta
+
+		# Prepare mapping subdirectory Makefile
+		config_file_make=$subdirectory/mapping-miRNA.mk
+		echo "include $(basename $config_file_make)" >> $subdirectory/Makefile
+		targets+=" mapping-miRNA"
+
+		# Prepare the filtering Makefile configuration file
+		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
+		echo "SUBDIR+=$dir_mapping/$(basename ${reference%.*})" >> $config_file_make
+		echo "FILE_FASTA=../../RawSequenceFiltering/"$subdirectory"_trimmed.fasta" >> $config_file_make
+		echo "REFERENCE=../../reference/$(basename ${reference%.*}).fasta" >> $config_file_make
+		tail -n+6 $dir_scripts/Templates/Makefile_GenomeMapping-miRNA_Template >> $config_file_make
+	fi
+
+	if [ "$command" == "mapping-others" ] || [ "$command" == "mapping" ] || [ "$command" == "all" ]
+	then
+		echo "mapping-others"
+		subdir_reference=$subdirectory/reference-others
+#		mkdir -p $subdir_reference
+		CreateDir $subdir_reference
+		# Prepare the directory structure
+#		mkdir -p $subdirectory/$dir_mapping
+		CreateDir $subdirectory/$dir_mapping
+		dir_reference_others=$(grep dir_reference_others $file_configuration | cut -f2 | tail -n1)
+		dir_reference_miRNA=$(grep dir_reference_miRNA $file_configuration | cut -f2 | tail -n1)
+		file_reference_miRNA=$(ls $dir_reference_miRNA | tail -n1)
+		for reference in $(find $dir_reference_others/*)
+		do
+#			mkdir -p $subdirectory/$dir_mapping/$(basename ${reference%.*})
+			CreateDir $subdirectory/$dir_mapping/$(basename ${reference%.*})
+#			ln -sf ../../$reference $subdir_reference/$(basename ${reference%.*}).fasta
+#			cat $reference | $dir_scripts/Utility/convertRNAfastaToDNA.py > $subdir_reference/$(basename ${reference%.*}).fasta
+		done
+
+		# Prepare mapping subdirectory Makefile
+		echo "include mapping-others.mk" >> $subdirectory/Makefile
+		targets+=" mapping-others"
+
+		# Prepare the filtering Makefile configuration file
+		config_file_make=$subdirectory/mapping-others.mk
+		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
+		for reference in $(find $dir_reference_others/* | grep '\.fa\|\.fasta')
+		do
+#			echo "TARGETS_BAM+=$dir_mapping/$(basename ${reference%.*})/$(basename ${reference%.*}).bam" >> $config_file_make
+			echo "TARGETS_BAM+=$dir_mapping/bam/$(basename ${reference%.*}).bam" >> $config_file_make
+		done
+		echo "DIR_FASTQ=$(basename ${file_reference_miRNA%.*})" >> $config_file_make
+		echo "DIR_SOURCE_REFERENCE=../$dir_reference_others" >> $config_file_make
+		echo "BASE_FASTQ="$subdirectory"_trimmed_unmapped.fastq" >> $config_file_make
+		echo "BASE_OUTPUT="${file%.*} >> $config_file_make
+		tail -n+8 $dir_scripts/Templates/Makefile_GenomeMapping-Others_Template >> $config_file_make
+	fi
+
+	# Complete the subdirectory Makefile
+	echo "" >> $subdirectory/Makefile
+	echo "FILE_SUMMARY=$dir_mapping/summary.txt" >> $subdirectory/Makefile
+	echo "TARGETS=$targets \$(FILE_SUMMARY)" >> $subdirectory/Makefile
+	echo "" >> $subdirectory/Makefile
+	echo ".PHONY: all" >> $subdirectory/Makefile
+	echo "all: \$(TARGETS)" >> $subdirectory/Makefile
+	echo "" >> $subdirectory/Makefile
+	echo "\$(FILE_SUMMARY): \$(TARGETS_BAM) \$(TARGET_FASTA)" >> $subdirectory/Makefile
+        echo -e "\techo -e \"RNA_specie\tCount\" > \$(FILE_SUMMARY)" >> $subdirectory/Makefile
+        echo -e "\t\$(DIR_SCRIPTS)/Utility/summarize_mapping.sh | sort -nr -k2 >> \$(FILE_SUMMARY)" >> $subdirectory/Makefile 
 done
 
-# Complete the main Makefile
-echo "" >> Makefile
-cat $dir_scripts/Templates/Makefile_MainDirectory_Template >> Makefile
+# Complete the main makefile
+echo "" >> $main_makefile
+cat $dir_scripts/Templates/Makefile_MainDirectory_Template >> $main_makefile

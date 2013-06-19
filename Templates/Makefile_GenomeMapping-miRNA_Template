@@ -1,0 +1,49 @@
+# To add with: init mapping/all
+# DIR_SCRIPTS=...
+# SUBDIR+=...
+# FILE_FASTA=...
+# REFERENCE=...
+
+# Prepare variables
+DIR_META=$(SUBDIR)/Meta
+DIR_STATISTICS=$(SUBDIR)/Statistics
+
+TARGET_BLAST=$(SUBDIR)/$(basename $(notdir $(FILE_FASTA))).out
+TARGET_SUMMARY=$(basename $(TARGET_BLAST))_summary.txt
+TARGET_FASTA=$(basename $(TARGET_BLAST))_miRNA.fasta
+TARGET_FASTA_UNMAPPED=$(basename $(TARGET_BLAST))_unmapped.fasta
+TARGET_FASTQ_UNMAPPED=$(basename $(TARGET_BLAST))_unmapped.fastq
+
+TOOLS_ALIGNMENT=$(DIR_SCRIPTS)/Alignment-Tools/Alignment-Tools
+TOOLS_ALIGNMENT+= $(DIR_SCRIPTS)/Alignment-Tools/Utility/blastn
+TOOLS_ALIGNMENT+= $(DIR_SCRIPTS)/Alignment-Tools/Template/Makefile_blastn_Template
+
+TOOLS_BLAST_ANALYSIS=$(DIR_SCRIPTS)/Utility/BlastAnalysis.py 
+TOOLS_BLAST_ANALYSIS+= $(DIR_SCRIPTS)/Utility/BlastParser.py
+TOOLS_BLAST_ANALYSIS+= $(DIR_SCRIPTS)/Utility/getFasta.py
+
+PERL=$(shell which perl)
+
+# Build directory structure
+$(shell mkdir -p $(SUBDIR))
+$(shell mkdir -p $(DIR_META))
+
+# Alignment
+.PHONY: mapping-miRNA
+mapping-miRNA: $(TARGET_SUMMARY) $(TARGET_FASTA) $(TARGET_FASTQ_UNMAPPED)
+
+$(TARGET_FASTQ_UNMAPPED): $(TARGET_FASTA) $(PERL) $(DIR_SCRIPTS)/Utility/fasta_to_fastq.pl
+	$(PERL) $(DIR_SCRIPTS)/Utility/fasta_to_fastq.pl $< | sed 's/@ P/@P/g' > $@
+
+$(TARGET_FASTA_UNMAPPED): $(TOOLS_BLAST_ANALYSIS) $(TARGET_BLAST)
+	cd $(SUBDIR); $< $(notdir $(TARGET_BLAST)) id | grep -v no_match | cut -f3- | $(DIR_SCRIPTS)/Utility/getFasta.py $(FILE_FASTA) not-match > $(notdir $@)
+
+$(TARGET_FASTA): $(TOOLS_BLAST_ANALYSIS) $(TARGET_BLAST)
+	cd $(SUBDIR); $< $(notdir $(TARGET_BLAST)) id | grep -v no_match | cut -f3- | $(DIR_SCRIPTS)/Utility/getFasta.py $(FILE_FASTA) match > $(notdir $@)
+
+$(TARGET_SUMMARY): $(TARGET_BLAST) $(TOOLS_BLAST_ANALYSIS)
+	$(DIR_SCRIPTS)/Utility/BlastAnalysis.py $< summary > $@
+
+$(TARGET_BLAST): $(TOOLS_ALIGNMENT)
+	cd $(SUBDIR); $< init blastn $(FILE_FASTA) $(REFERENCE) "-evalue;0.01;-word_size;4;"
+	$(MAKE) -C $(SUBDIR)

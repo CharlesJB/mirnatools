@@ -1,0 +1,33 @@
+# To add with init
+#DIR_SCRIPTS=/home/cjbparlant/git-clones/miRNA-Tools
+#TARGETS_BAM+=GenomeMapping/bam/DNA.bam
+#DIR_FASTQ=mature_hsapiens
+#DIR_SOURCE_REFERENCE=../reference-others
+#BASE_FASTQ=./s3_run45_trimmed_unmapped.fastq
+#BASE_OUTPUT=s3_run45
+
+# Prepare variables
+DIR_MAPPING=GenomeMapping
+DIR_BAM=$(DIR_MAPPING)/bam
+DIR_REFERENCE=reference-others
+FILE_FASTQ=$(DIR_FASTQ)/$(BASE_FASTQ)
+TARGET_GRAPH=$(DIR_MAPPING)/$(BASE_OUTPUT)"-$(DIR_MAPPING).tiff"
+FILE_INTERMEDIATE_GRAPH=$(DIR_MAPPING)/$(BASE_OUTPUT)"-$(DIR_MAPPING).df"
+
+# Prepare Directory Structure
+$(shell mkdir -p $(DIR_BAM))
+
+# Alignment
+.SECONDARY:
+
+.PHONY: mapping-others
+mapping-others: $(TARGETS_BAM)
+
+$(DIR_BAM)/%.bam: $(DIR_MAPPING)/$(FILE_FASTQ) $(DIR_REFERENCE)/%.fasta
+	mkdir -p $(DIR_MAPPING)/$(basename $(notdir $@))
+	cd $(DIR_MAPPING)/$(basename $(notdir $@)); $(DIR_SCRIPTS)/Alignment-Tools/Alignment-Tools init bwa-aln ../$(FILE_FASTQ) ../../$(DIR_REFERENCE)/$(basename $(notdir $(@:_trimmed.bam=))).fasta "-n;3;-o;0;-d;0;-i;0"
+	$(MAKE) -C $(DIR_MAPPING)/$(basename $(notdir $@))
+	ln -sf ../$(basename $(notdir $@))/$(basename $(notdir $(BASE_FASTQ))).bam $@
+
+$(DIR_REFERENCE)/%.fasta: $(DIR_SOURCE_REFERENCE)/%.fa
+	cat $< | $(DIR_SCRIPTS)/Utility/convertRNAfastaToDNA.py > $@
