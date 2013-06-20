@@ -111,7 +111,7 @@ do
 #		mkdir -p $subdirectory/$dir_mapping
 		CreateDir $subdirectory/$dir_mapping
 		dir_reference_miRNA=$(grep dir_reference_miRNA $file_configuration | cut -f2 | tail -n1)
-		reference=$(find $dir_reference_miRNA/* | head -n1)
+		reference=$(find $dir_reference_miRNA/mature* | head -n1)
 		cat $reference | $dir_scripts/Utility/convertRNAfastaToDNA.py > $subdir_reference/$(basename ${reference%.*}).fasta
 
 		# Prepare mapping subdirectory Makefile
@@ -164,6 +164,27 @@ do
 		echo "BASE_FASTQ="$subdirectory"_trimmed_unmapped.fastq" >> $config_file_make
 		echo "BASE_OUTPUT="${file%.*} >> $config_file_make
 		tail -n+8 $dir_scripts/Templates/Makefile_GenomeMapping-Others_Template >> $config_file_make
+	fi
+	if [ "$command" == "hairpin-alignment" ] || [ "$command" == "all" ]
+	then
+		echo "hairpin-alignment"
+		dir_hairpin=$subdirectory/HairpinsAlignment
+		dir_reference=$subdirectory/reference
+		dir_reference_miRNA=$(grep dir_reference_miRNA $file_configuration | cut -f2 | tail -n1)
+		reference_hairpin=$(find $dir_reference_miRNA/hairpin* | head -n1)
+		reference_mature=$(find $dir_reference_miRNA/mature* | head -n1)
+		mkdir -p $dir_hairpin
+		mkdir -p $dir_reference
+		ln -sf ../../$reference_hairpin $dir_reference/$(basename $reference_hairpin)
+		ln -sf ../../$reference_mature $dir_reference/$(basename $reference_mature)
+		echo "include hairpin-alignment.mk" >> $subdirectory/Makefile
+		targets+=" hairpin-alignment"
+		config_file_make=$subdirectory/hairpin-alignment.mk
+		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
+		echo "FILE_UNIQUE_FASTA=$dir_filtering/$(basename $(ls $subdirectory/$dir_filtering/*fasta | head -n1))" >> $config_file_make
+		echo "FILE_HAIRPIN_FASTA=reference/$(basename $reference_hairpin)" >> $config_file_make
+		echo "FILE_MATURE_FASTA=reference/$(basename $(find $dir_reference_miRNA/mature* | head -n1))" >> $config_file_make
+		tail -n+6 $dir_scripts/Templates/Makefile_HairpinAlignment_Template >> $config_file_make
 	fi
 
 	# Complete the subdirectory Makefile
