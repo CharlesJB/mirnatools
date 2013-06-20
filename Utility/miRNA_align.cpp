@@ -242,7 +242,7 @@ int main(int argc, char* argv[]){
         ifstream f1(readSequences.c_str());
         map<int,ReadSequence> reads;
         while(!f1.eof()){
-                char buffer[3000];
+                char buffer[3000]={0};
                 f1>>buffer;
 
                 if(buffer[0]=='>'){
