@@ -1,50 +1,50 @@
 # To add with init
 #DIR_SCRIPTS=...
-#FILES+=...
-#FILE_SOURCE_FASTA=...
+#FILES_CONTRIB+=...
+#FILE_SOURCE_FASTA_CONTRIB=...
 
-DIR_SOURCE_FASTA=GenomeMapping/fasta
-DIR_RESULTS=ContributionAnalysis
-DIR_FASTA=$(DIR_RESULTS)/Fasta
-DIR_INTERMEDIATE=$(DIR_RESULTS)/Intermediate
+DIR_SOURCE_FASTA_CONTRIB=GenomeMapping/fasta
+DIR_RESULTS_CONTRIB=ContributionAnalysis
+DIR_FASTA_CONTRIB=$(DIR_RESULTS_CONTRIB)/Fasta
+DIR_INTERMEDIATE_CONTRIB=$(DIR_RESULTS_CONTRIB)/Intermediate
 
-TARGETS_FASTA=$(addprefix $(DIR_FASTA)/, $(FILES))
-TARGET_COUNT=$(DIR_RESULTS)/count.txt
-TARGETS_INTERMEDIATE=$(addprefix $(DIR_RESULTS)/, $(addsuffix _Contribution.txt, $(basename $(FILES))))
-TARGET_SOURCE_INTERMEDIATE=$(DIR_INTERMEDIATE)/source_Contribution.txt
-TARGET_ALL=$(DIR_RESULTS)/all.tiff
-TARGET_ALL_INTERMEDIATE=$(DIR_INTERMEDIATE)/all.txt
-TARGET_ALL_FASTA=$(DIR_FASTA)/all.fasta
-TARGETS=$(addprefix $(DIR_RESULTS)/, $(addsuffix _Contribution.tiff, $(basename $(FILES))))
+TARGETS_FASTA_CONTRIB=$(addprefix $(DIR_FASTA_CONTRIB)/, $(FILES_CONTRIB))
+TARGET_COUNT_CONTRIB=$(DIR_RESULTS_CONTRIB)/count.txt
+TARGETS_INTERMEDIATE_CONTRIB=$(addprefix $(DIR_RESULTS_CONTRIB)/, $(addsuffix _Contribution.txt, $(basename $(FILES_CONTRIB))))
+TARGET_SOURCE_INTERMEDIATE_CONTRIB=$(DIR_INTERMEDIATE_CONTRIB)/source_Contribution.txt
+TARGET_ALL_CONTRIB=$(DIR_RESULTS_CONTRIB)/all.tiff
+TARGET_ALL_INTERMEDIATE_CONTRIB=$(DIR_INTERMEDIATE_CONTRIB)/all.txt
+TARGET_ALL_FASTA_CONTRIB=$(DIR_FASTA_CONTRIB)/all.fasta
+TARGETS_CONTRIB=$(addprefix $(DIR_RESULTS_CONTRIB)/, $(addsuffix _Contribution.tiff, $(basename $(FILES_CONTRIB))))
 
 .SECONDARY:
 .PHONY: contribution
-contribution: $(TARGETS) $(TARGET_ALL)
+contribution: $(TARGETS_CONTRIB) $(TARGET_ALL_CONTRIB)
 
-$(DIR_RESULTS)/%.tiff: $(DIR_INTERMEDIATE)/%.txt $(DIR_SCRIPTS)/Rscripts/PlotRelativeLengthDistribution.R $(TARGET_SOURCE_INTERMEDIATE)
-	Rscript $(DIR_SCRIPTS)/Rscripts/PlotRelativeLengthDistribution.R $< $(TARGET_SOURCE_INTERMEDIATE) $(basename $@)
+$(DIR_RESULTS_CONTRIB)/%.tiff: $(DIR_INTERMEDIATE_CONTRIB)/%.txt $(DIR_SCRIPTS)/Rscripts/PlotRelativeLengthDistribution.R $(TARGET_SOURCE_INTERMEDIATE_CONTRIB)
+	Rscript $(DIR_SCRIPTS)/Rscripts/PlotRelativeLengthDistribution.R $< $(TARGET_SOURCE_INTERMEDIATE_CONTRIB) $(basename $@)
 
-$(TARGET_ALL): $(TARGET_ALL_INTERMEDIATE) $(TARGET_SOURCE_INTERMEDIATE) $(DIR_SCRIPTS)/Rscripts/PlotRelativeLengthDistribution.R
-	Rscript $(DIR_SCRIPTS)/Rscripts/PlotRelativeLengthDistribution.R $< $(TARGET_SOURCE_INTERMEDIATE) $(basename $@)
+$(TARGET_ALL_CONTRIB): $(TARGET_ALL_INTERMEDIATE_CONTRIB) $(TARGET_SOURCE_INTERMEDIATE_CONTRIB) $(DIR_SCRIPTS)/Rscripts/PlotRelativeLengthDistribution.R
+	Rscript $(DIR_SCRIPTS)/Rscripts/PlotRelativeLengthDistribution.R $< $(TARGET_SOURCE_INTERMEDIATE_CONTRIB) $(basename $@)
 
-$(TARGET_SOURCE_INTERMEDIATE): $(FILE_SOURCE_FASTA) $(DIR_SCRIPTS)/Utility/LengthDistribution.py
-	mkdir -p $(DIR_INTERMEDIATE)
-	cat $< | $(DIR_SCRIPTS)/Utility/LengthDistribution.py 60 $(shell head -n1 $(TARGET_COUNT)) > $@
+$(TARGET_SOURCE_INTERMEDIATE_CONTRIB): $(FILE_SOURCE_FASTA_CONTRIB) $(DIR_SCRIPTS)/Utility/LengthDistribution.py
+	mkdir -p $(DIR_INTERMEDIATE_CONTRIB)
+	cat $< | $(DIR_SCRIPTS)/Utility/LengthDistribution.py 60 $(shell head -n1 $(TARGET_COUNT_CONTRIB)) > $@
 
-$(TARGET_ALL_INTERMEDIATE): $(TARGET_ALL_FASTA) $(DIR_SCRIPTS)/Utility/LengthDistribution.py
-	mkdir -p $(DIR_INTERMEDIATE)
-	cat $< | $(DIR_SCRIPTS)/Utility/LengthDistribution.py 60 $(shell head -n1 $(TARGET_COUNT)) > $@
+$(TARGET_ALL_INTERMEDIATE_CONTRIB): $(TARGET_ALL_FASTA_CONTRIB) $(DIR_SCRIPTS)/Utility/LengthDistribution.py
+	mkdir -p $(DIR_INTERMEDIATE_CONTRIB)
+	cat $< | $(DIR_SCRIPTS)/Utility/LengthDistribution.py 60 $(shell head -n1 $(TARGET_COUNT_CONTRIB)) > $@
 
-$(DIR_INTERMEDIATE)/%_Contribution.txt: $(DIR_FASTA)/%.fasta $(DIR_SCRIPTS)/Utility/LengthDistribution.py $(TARGET_COUNT)
-	mkdir -p $(DIR_INTERMEDIATE)
-	cat $< | $(DIR_SCRIPTS)/Utility/LengthDistribution.py 60 $(shell head -n1 $(TARGET_COUNT)) > $@
+$(DIR_INTERMEDIATE_CONTRIB)/%_Contribution.txt: $(DIR_FASTA_CONTRIB)/%.fasta $(DIR_SCRIPTS)/Utility/LengthDistribution.py $(TARGET_COUNT_CONTRIB)
+	mkdir -p $(DIR_INTERMEDIATE_CONTRIB)
+	cat $< | $(DIR_SCRIPTS)/Utility/LengthDistribution.py 60 $(shell head -n1 $(TARGET_COUNT_CONTRIB)) > $@
 
-$(TARGET_COUNT): $(FILE_SOURCE_FASTA)
+$(TARGET_COUNT_CONTRIB): $(FILE_SOURCE_FASTA_CONTRIB)
 	grep '>' $< | awk '{ sum+=$$NF } END { print sum }' > $@
 
-$(TARGET_ALL_FASTA): $(TARGETS_FASTA) $(DIR_SCRIPTS)/Utility/getFasta.py $(FILE_SOURCE_FASTA)
-	grep '>' $(TARGETS_FASTA) | awk '{print $$2}' | sort | uniq | $(DIR_SCRIPTS)/Utility/getFasta.py $(FILE_SOURCE_FASTA) match > $@
+$(TARGET_ALL_FASTA_CONTRIB): $(TARGETS_FASTA_CONTRIB) $(DIR_SCRIPTS)/Utility/getFasta.py $(FILE_SOURCE_FASTA_CONTRIB)
+	grep '>' $(TARGETS_FASTA_CONTRIB) | awk '{print $$2}' | sort | uniq | $(DIR_SCRIPTS)/Utility/getFasta.py $(FILE_SOURCE_FASTA_CONTRIB) match > $@
 
-$(DIR_FASTA)/%.fasta: $(DIR_SOURCE_FASTA)/%.fasta
-	mkdir -p $(DIR_FASTA)
+$(DIR_FASTA_CONTRIB)/%.fasta: $(DIR_SOURCE_FASTA_CONTRIB)/%.fasta
+	mkdir -p $(DIR_FASTA_CONTRIB)
 	ln -s ../../$< $@
