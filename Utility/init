@@ -70,24 +70,20 @@ rm -f $main_makefile
 
 for file in $(ls $dir_data)
 do
-	echo "-------------------"
-	echo $file
-	echo ""
 	# Create the subdirectory for the current file
 	targets=""
 	subdirectory=$dir_results/$(basename ${file%.*})
+	rm -f $subdirectory/Makefile
 
 	# Add the subdirectory to main Makefile
 	echo SUBDIRS+=$subdirectory >> $main_makefile 
 
-	# Create the subdirectory Makefile
-	echo "DIR_SCRIPTS=$dir_scripts" > $subdirectory/Makefile
-
 	if [ "$command" == "filtering" ] || [ "$command" == "all" ]
 	then
-		echo "filtering"
-#		mkdir -p $subdirectory/$dir_filtering
+		# Create the subdirectory Makefile
 		CreateDir $subdirectory/$dir_filtering
+		echo "DIR_SCRIPTS=$dir_scripts" > $subdirectory/Makefile
+
 		adaptor=$(grep adaptor $file_configuration | cut -f2 | tail -n1)
 
 		# Prepare filtering subdirectory Makefile
@@ -157,13 +153,15 @@ do
 		for reference in $(find $dir_reference_others/* | grep '\.fa\|\.fasta')
 		do
 #			echo "TARGETS_BAM+=$dir_mapping/$(basename ${reference%.*})/$(basename ${reference%.*}).bam" >> $config_file_make
-			echo "TARGETS_BAM+=$dir_mapping/bam/$(basename ${reference%.*}).bam" >> $config_file_make
+#			echo "TARGETS_BAM+=$dir_mapping/bam/$(basename ${reference%.*}).bam" >> $config_file_make
+			echo "BASE_FILES+=$(basename ${reference%.*})" >> $config_file_make
 		done
 		echo "DIR_FASTQ=$(basename ${file_reference_miRNA%.*})" >> $config_file_make
 		echo "DIR_SOURCE_REFERENCE=../$dir_reference_others" >> $config_file_make
 		echo "BASE_FASTQ="$subdirectory"_trimmed_unmapped.fastq" >> $config_file_make
 		echo "BASE_OUTPUT="${file%.*} >> $config_file_make
-		tail -n+8 $dir_scripts/Templates/Makefile_GenomeMapping-Others_Template >> $config_file_make
+		echo "FILE_FASTA=RawSequenceFiltering/"$subdirectory"_trimmed.fasta" >> $config_file_make
+		tail -n+9 $dir_scripts/Templates/Makefile_GenomeMapping-Others_Template >> $config_file_make
 	fi
 	if [ "$command" == "hairpin-alignment" ] || [ "$command" == "all" ]
 	then
@@ -219,19 +217,8 @@ do
 	fi
 	# Complete the subdirectory Makefile
 	echo "" >> $subdirectory/Makefile
-	echo "FILE_IMAGE=$dir_mapping/mapping.tiff" >> $subdirectory/Makefile
-	echo "FILE_SUMMARY=$dir_mapping/summary.txt" >> $subdirectory/Makefile
-	echo "TARGETS=$targets \$(FILE_SUMMARY)" >> $subdirectory/Makefile
-	echo "" >> $subdirectory/Makefile
-	echo ".PHONY: all" >> $subdirectory/Makefile
-	echo "all: \$(TARGETS) \$(FILE_IMAGE)" >> $subdirectory/Makefile
-	echo "" >> $subdirectory/Makefile
-	echo "\$(FILE_IMAGE): \$(FILE_SUMMARY)" >> $subdirectory/Makefile
-        echo -e "\tRscript \$(DIR_SCRIPTS)/Rscripts/GenomeMapping.R \$(FILE_SUMMARY) \$@" >> $subdirectory/Makefile
-	echo "" >> $subdirectory/Makefile
-	echo "\$(FILE_SUMMARY): \$(TARGETS_BAM) \$(TARGET_FASTA)" >> $subdirectory/Makefile
-        echo -e "\techo -e \"RNA_specie\tCount\" > \$(FILE_SUMMARY)" >> $subdirectory/Makefile
-        echo -e "\t\$(DIR_SCRIPTS)/Utility/summarize_mapping.sh | sort -nr -k2 >> \$(FILE_SUMMARY)" >> $subdirectory/Makefile 
+	echo "TARGETS=$targets" >> $subdirectory/Makefile
+	tail -n+4 $dir_scripts/Templates/Makefile_SubDirectories_Template >> $subdirectory/Makefile
 done
 
 # Complete the main makefile
