@@ -195,12 +195,12 @@ do
 		config_file_make=$subdirectory/length-distribution.mk
 		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
 		dir_reference_others=$(grep dir_reference_others $file_configuration | cut -f2 | tail -n1)
-		file_source_fasta=$subdirectory"_trimmed.fasta"
+		file_source_fasta=$(basename $subdirectory)"_trimmed.fasta"
 		for file in $(ls $dir_reference_others)
 		do
 			echo "FILES_LENGTH+=${file%.*}.fasta" >> $config_file_make
 		done
-		echo "FILES_LENGTH+=$source_file_fasta" >> $config_file_make
+		echo "FILES_LENGTH+=$file_source_fasta" >> $config_file_make
 		tail -n+4 $dir_scripts/Templates/Makefile_LengthDistribution_Template >> $config_file_make
 	fi
 	if [ "$command" == "contribution" ] || [ "$command" == "all" ]
@@ -211,13 +211,13 @@ do
 		targets+=" contribution"
 		mkdir -p $dir_contribution
 		config_file_make=$subdirectory/contribution.mk
-		file_source_fasta=$dir_filtering/$subdirectory"_trimmed.fasta"
+		file_source_fasta=$(basename $subdirectory)"_trimmed.fasta"
 		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
 		for file in $(ls $dir_reference_others)
 		do
 			echo "FILES_CONTRIB+=${file%.*}.fasta" >> $config_file_make
 		done
-		echo "FILES_CONTRIB+=$source_file_fasta" >> $config_file_make
+		echo "FILES_CONTRIB+=$file_source_fasta" >> $config_file_make
 		echo "FILE_SOURCE_FASTA_CONTRIB=$file_source_fasta" >> $config_file_make
 		tail -n+5 $dir_scripts/Templates/Makefile_Contribution_Template >> $config_file_make
 	fi
