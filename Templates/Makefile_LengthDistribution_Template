@@ -1,0 +1,27 @@
+# To add with init
+#DIR_SCRIPTS=...
+#FILES+=...
+
+DIR_SOURCE_FASTA=GenomeMapping/fasta
+DIR_RESULTS=LengthDistributionAnalysis
+DIR_FASTA=$(DIR_RESULTS)/Fasta
+DIR_INTERMEDIATE=$(DIR_RESULTS)/Intermediate
+
+TARGETS_FASTA=$(addprefix $(DIR_FASTA)/, $(FILES))
+TARGETS_INTERMEDIATE=$(addprefix $(DIR_INTERMEDIATE)/, $(addsuffix _lengthDistribution.txt, $(basename $(FILES))))
+TARGETS=$(addprefix $(DIR_RESULTS)/, $(addsuffix _lengthDistribution.tiff, $(basename $(FILES))))
+
+.SECONDARY:
+.PHONY: length-distribution
+length-distribution: $(TARGETS)
+
+$(DIR_RESULTS)/%.tiff: $(DIR_INTERMEDIATE)/%.txt $(DIR_SCRIPTS)/Rscripts/PlotLengthDistribution.R
+	Rscript $(DIR_SCRIPTS)/Rscripts/PlotLengthDistribution.R $< $(basename $@)
+
+$(DIR_INTERMEDIATE)/%_lengthDistribution.txt: $(DIR_FASTA)/%.fasta $(DIR_SCRIPTS)/Utility/LengthDistribution.py
+	mkdir -p $(DIR_INTERMEDIATE)
+	cat $< | $(DIR_SCRIPTS)/Utility/LengthDistribution.py 60 > $@
+
+$(DIR_FASTA)/%.fasta: $(DIR_SOURCE_FASTA)/%.fasta
+	mkdir -p $(DIR_FASTA)
+	ln -s ../../$< $@

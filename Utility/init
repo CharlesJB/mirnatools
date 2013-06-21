@@ -186,7 +186,37 @@ do
 		echo "FILE_MATURE_FASTA=reference/$(basename $(find $dir_reference_miRNA/mature* | head -n1))" >> $config_file_make
 		tail -n+6 $dir_scripts/Templates/Makefile_HairpinAlignment_Template >> $config_file_make
 	fi
-
+	if [ "$command" == "length-distribution" ] || [ "$command" == "all" ]
+	then
+		echo "length-distribution"
+		dir_length=$subdirectory/LengthDistributionAnalysis
+		echo "include length-distribution.mk" >> $subdirectory/Makefile
+		targets+=" length-distribution"
+		mkdir -p $dir_length
+		config_file_make=$subdirectory/length-distribution.mk
+		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
+		for file in $(ls $subdirectory/$dir_mapping/fasta)
+		do
+			echo "FILES+=$file" >> $config_file_make
+		done
+		tail -n+4 $dir_scripts/Templates/Makefile_LengthDistribution_Template >> $config_file_make
+	fi
+	if [ "$command" == "contribution" ] || [ "$command" == "all" ]
+	then
+		echo "contribution"
+		dir_contribution=$subdirectory/ContributionAnalysis
+		echo "include contribution.mk" >> $subdirectory/Makefile
+		targets+=" contribution"
+		mkdir -p $dir_contribution
+		config_file_make=$subdirectory/contribution.mk
+		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
+		for file in $(ls $subdirectory/$dir_mapping/fasta)
+		do
+			echo "FILES+=$file" >> $config_file_make
+		done
+		echo "FILE_SOURCE_FASTA=$dir_filtering/$(ls $subdirectory/$dir_filtering/ | grep fasta | head -n1)" >> $config_file_make
+		tail -n+5 $dir_scripts/Templates/Makefile_Contribution_Template >> $config_file_make
+	fi
 	# Complete the subdirectory Makefile
 	echo "" >> $subdirectory/Makefile
 	echo "FILE_IMAGE=$dir_mapping/mapping.tiff" >> $subdirectory/Makefile
