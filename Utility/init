@@ -64,12 +64,20 @@ then
 fi
 
 # Start the real work
+echo ""
+echo "Starting initialization!"
+echo ""
+
 main_makefile=Makefile
 # Reset main directory's Makefile
 rm -f $main_makefile
 
+sample_count=0
 for file in $(ls $dir_data)
 do
+	sample_count=$((sample_count+1))
+	echo "Sample #$sample_count: $file"
+	echo ------------------------------
 	# Create the subdirectory for the current file
 	targets=""
 	subdirectory=$dir_results/$(basename ${file%.*})
@@ -80,6 +88,7 @@ do
 
 	if [ "$command" == "filtering" ] || [ "$command" == "all" ]
 	then
+		echo "Preparing Raw Sequence Filtering..."
 		# Create the subdirectory Makefile
 		CreateDir $subdirectory/$dir_filtering
 		echo "DIR_SCRIPTS=$dir_scripts" > $subdirectory/Makefile
@@ -99,7 +108,7 @@ do
 
 	if [ "$command" == "mapping-miRNA" ] || [ "$command" == "mapping" ] || [ "$command" == "all" ]
 	then
-		echo "mapping-miRNA"
+		echo "Preparing Genome Mapping to other mature miRNA database..."
 		subdir_reference=$subdirectory/reference
 #		mkdir -p $subdir_reference
 		CreateDir $subdir_reference
@@ -118,29 +127,23 @@ do
 		# Prepare the filtering Makefile configuration file
 		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
 		echo "SUBDIR+=$dir_mapping/$(basename ${reference%.*})" >> $config_file_make
-		echo "FILE_FASTA=../../RawSequenceFiltering/"$subdirectory"_trimmed.fasta" >> $config_file_make
-		echo "REFERENCE=../../reference/$(basename ${reference%.*}).fasta" >> $config_file_make
+		echo "FILE_FASTA_MIRNA=../../RawSequenceFiltering/"$subdirectory"_trimmed.fasta" >> $config_file_make
+		echo "REFERENCE_MIRNA=../../reference/$(basename ${reference%.*}).fasta" >> $config_file_make
 		tail -n+6 $dir_scripts/Templates/Makefile_GenomeMapping-miRNA_Template >> $config_file_make
 	fi
 
 	if [ "$command" == "mapping-others" ] || [ "$command" == "mapping" ] || [ "$command" == "all" ]
 	then
-		echo "mapping-others"
+		echo "Preparing Genome Mapping to other databases..."
 		subdir_reference=$subdirectory/reference-others
-#		mkdir -p $subdir_reference
 		CreateDir $subdir_reference
-		# Prepare the directory structure
-#		mkdir -p $subdirectory/$dir_mapping
 		CreateDir $subdirectory/$dir_mapping
 		dir_reference_others=$(grep dir_reference_others $file_configuration | cut -f2 | tail -n1)
 		dir_reference_miRNA=$(grep dir_reference_miRNA $file_configuration | cut -f2 | tail -n1)
 		file_reference_miRNA=$(ls $dir_reference_miRNA | tail -n1)
 		for reference in $(find $dir_reference_others/*)
 		do
-#			mkdir -p $subdirectory/$dir_mapping/$(basename ${reference%.*})
 			CreateDir $subdirectory/$dir_mapping/$(basename ${reference%.*})
-#			ln -sf ../../$reference $subdir_reference/$(basename ${reference%.*}).fasta
-#			cat $reference | $dir_scripts/Utility/convertRNAfastaToDNA.py > $subdir_reference/$(basename ${reference%.*}).fasta
 		done
 
 		# Prepare mapping subdirectory Makefile
@@ -152,20 +155,18 @@ do
 		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
 		for reference in $(find $dir_reference_others/* | grep '\.fa\|\.fasta')
 		do
-#			echo "TARGETS_BAM+=$dir_mapping/$(basename ${reference%.*})/$(basename ${reference%.*}).bam" >> $config_file_make
-#			echo "TARGETS_BAM+=$dir_mapping/bam/$(basename ${reference%.*}).bam" >> $config_file_make
-			echo "BASE_FILES+=$(basename ${reference%.*})" >> $config_file_make
+			echo "BASE_FILES_OTHER+=$(basename ${reference%.*})" >> $config_file_make
 		done
-		echo "DIR_FASTQ=$(basename ${file_reference_miRNA%.*})" >> $config_file_make
-		echo "DIR_SOURCE_REFERENCE=../$dir_reference_others" >> $config_file_make
-		echo "BASE_FASTQ="$subdirectory"_trimmed_unmapped.fastq" >> $config_file_make
-		echo "BASE_OUTPUT="${file%.*} >> $config_file_make
-		echo "FILE_FASTA=RawSequenceFiltering/"$subdirectory"_trimmed.fasta" >> $config_file_make
+		echo "DIR_FASTQ_OTHER=$(basename ${file_reference_miRNA%.*})" >> $config_file_make
+		echo "DIR_SOURCE_REFERENCE_OTHER=../$dir_reference_others" >> $config_file_make
+		echo "BASE_FASTQ_OTHER="$subdirectory"_trimmed_unmapped.fastq" >> $config_file_make
+		echo "BASE_OUTPUT_OTHER="${file%.*} >> $config_file_make
+		echo "FILE_FASTA_OTHER=RawSequenceFiltering/"$subdirectory"_trimmed.fasta" >> $config_file_make
 		tail -n+9 $dir_scripts/Templates/Makefile_GenomeMapping-Others_Template >> $config_file_make
 	fi
 	if [ "$command" == "hairpin-alignment" ] || [ "$command" == "all" ]
 	then
-		echo "hairpin-alignment"
+		echo "Preparing Hairpin Alignment..."
 		dir_hairpin=$subdirectory/HairpinsAlignment
 		dir_reference=$subdirectory/reference
 		dir_reference_miRNA=$(grep dir_reference_miRNA $file_configuration | cut -f2 | tail -n1)
@@ -179,48 +180,56 @@ do
 		targets+=" hairpin-alignment"
 		config_file_make=$subdirectory/hairpin-alignment.mk
 		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
-		echo "FILE_UNIQUE_FASTA=$dir_filtering/$(basename $(ls $subdirectory/$dir_filtering/*fasta | head -n1))" >> $config_file_make
-		echo "FILE_HAIRPIN_FASTA=reference/$(basename $reference_hairpin)" >> $config_file_make
-		echo "FILE_MATURE_FASTA=reference/$(basename $(find $dir_reference_miRNA/mature* | head -n1))" >> $config_file_make
+		echo "FILE_UNIQUE_FASTA_HAIRPIN=$dir_filtering/$(basename $(ls $subdirectory/$dir_filtering/*fasta | head -n1))" >> $config_file_make
+		echo "FILE_FASTA_HAIRPIN=reference/$(basename $reference_hairpin)" >> $config_file_make
+		echo "FILE_MATURE_FASTA_HAIRPIN=reference/$(basename $(find $dir_reference_miRNA/mature* | head -n1))" >> $config_file_make
 		tail -n+6 $dir_scripts/Templates/Makefile_HairpinAlignment_Template >> $config_file_make
 	fi
 	if [ "$command" == "length-distribution" ] || [ "$command" == "all" ]
 	then
-		echo "length-distribution"
+		echo "Preparing Length Distribution Analysis..."
 		dir_length=$subdirectory/LengthDistributionAnalysis
 		echo "include length-distribution.mk" >> $subdirectory/Makefile
 		targets+=" length-distribution"
 		mkdir -p $dir_length
 		config_file_make=$subdirectory/length-distribution.mk
 		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
-		for file in $(ls $subdirectory/$dir_mapping/fasta)
+		dir_reference_others=$(grep dir_reference_others $file_configuration | cut -f2 | tail -n1)
+		file_source_fasta=$subdirectory"_trimmed.fasta"
+		for file in $(ls $dir_reference_others)
 		do
-			echo "FILES+=$file" >> $config_file_make
+			echo "FILES_LENGTH+=${file%.*}.fasta" >> $config_file_make
 		done
+		echo "FILES_LENGTH+=$source_file_fasta" >> $config_file_make
 		tail -n+4 $dir_scripts/Templates/Makefile_LengthDistribution_Template >> $config_file_make
 	fi
 	if [ "$command" == "contribution" ] || [ "$command" == "all" ]
 	then
-		echo "contribution"
+		echo "Preparing Contribution Analysis..."
 		dir_contribution=$subdirectory/ContributionAnalysis
 		echo "include contribution.mk" >> $subdirectory/Makefile
 		targets+=" contribution"
 		mkdir -p $dir_contribution
 		config_file_make=$subdirectory/contribution.mk
+		file_source_fasta=$dir_filtering/$subdirectory"_trimmed.fasta"
 		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
-		for file in $(ls $subdirectory/$dir_mapping/fasta)
+		for file in $(ls $dir_reference_others)
 		do
-			echo "FILES+=$file" >> $config_file_make
+			echo "FILES_CONTRIB+=${file%.*}.fasta" >> $config_file_make
 		done
-		echo "FILE_SOURCE_FASTA=$dir_filtering/$(ls $subdirectory/$dir_filtering/ | grep fasta | head -n1)" >> $config_file_make
+		echo "FILES_CONTRIB+=$source_file_fasta" >> $config_file_make
+		echo "FILE_SOURCE_FASTA_CONTRIB=$file_source_fasta" >> $config_file_make
 		tail -n+5 $dir_scripts/Templates/Makefile_Contribution_Template >> $config_file_make
 	fi
 	# Complete the subdirectory Makefile
 	echo "" >> $subdirectory/Makefile
 	echo "TARGETS=$targets" >> $subdirectory/Makefile
 	tail -n+4 $dir_scripts/Templates/Makefile_SubDirectories_Template >> $subdirectory/Makefile
+	echo ""
 done
 
 # Complete the main makefile
 echo "" >> $main_makefile
 cat $dir_scripts/Templates/Makefile_MainDirectory_Template >> $main_makefile
+echo "Initialization over! You can start the analysis by typing: make"
+echo ""
