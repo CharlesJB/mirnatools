@@ -81,6 +81,10 @@ do
 	# Create the subdirectory for the current file
 	targets=""
 	subdirectory=$dir_results/$(basename ${file%.*})
+	dir_reference_miRNA=$(grep dir_reference_miRNA $file_configuration | cut -f2 | tail -n1)
+	dir_length=$subdirectory/LengthDistributionAnalysis
+	dir_contribution=$subdirectory/ContributionAnalysis
+	dir_novel=$subdirectory/NovelDiscovery
 	rm -f $subdirectory/Makefile
 
 	# Add the subdirectory to main Makefile
@@ -169,9 +173,10 @@ do
 		echo "Preparing Hairpin Alignment..."
 		dir_hairpin=$subdirectory/HairpinsAlignment
 		dir_reference=$subdirectory/reference
-		dir_reference_miRNA=$(grep dir_reference_miRNA $file_configuration | cut -f2 | tail -n1)
-		reference_hairpin=$(find $dir_reference_miRNA/hairpin* | head -n1)
-		reference_mature=$(find $dir_reference_miRNA/mature* | head -n1)
+		reference_hairpin=$(grep file_hairpin_hsapiens $file_configuration | cut -f2 | tail -n1)
+		reference_mature=$(grep file_mature_hsapiens $file_configuration | cut -f2 | tail -n1)
+#		reference_hairpin=$(find $dir_reference_miRNA/hairpin* | head -n1)
+#		reference_mature=$(find $dir_reference_miRNA/mature* | head -n1)
 		mkdir -p $dir_hairpin
 		mkdir -p $dir_reference
 		ln -sf ../../$reference_hairpin $dir_reference/$(basename $reference_hairpin)
@@ -188,7 +193,6 @@ do
 	if [ "$command" == "length-distribution" ] || [ "$command" == "all" ]
 	then
 		echo "Preparing Length Distribution Analysis..."
-		dir_length=$subdirectory/LengthDistributionAnalysis
 		echo "include length-distribution.mk" >> $subdirectory/Makefile
 		targets+=" length-distribution"
 		mkdir -p $dir_length
@@ -196,9 +200,9 @@ do
 		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
 		dir_reference_others=$(grep dir_reference_others $file_configuration | cut -f2 | tail -n1)
 		file_source_fasta=$(basename $subdirectory)"_trimmed.fasta"
-		for file in $(ls $dir_reference_others)
+		for file_reference_others in $(ls $dir_reference_others)
 		do
-			echo "FILES_LENGTH+=${file%.*}.fasta" >> $config_file_make
+			echo "FILES_LENGTH+=${file_reference_others%.*}.fasta" >> $config_file_make
 		done
 		echo "FILES_LENGTH+=$file_source_fasta" >> $config_file_make
 		tail -n+4 $dir_scripts/Templates/Makefile_LengthDistribution_Template >> $config_file_make
@@ -206,21 +210,50 @@ do
 	if [ "$command" == "contribution" ] || [ "$command" == "all" ]
 	then
 		echo "Preparing Contribution Analysis..."
-		dir_contribution=$subdirectory/ContributionAnalysis
 		echo "include contribution.mk" >> $subdirectory/Makefile
 		targets+=" contribution"
 		mkdir -p $dir_contribution
 		config_file_make=$subdirectory/contribution.mk
 		file_source_fasta=$(basename $subdirectory)"_trimmed.fasta"
 		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
-		for file in $(ls $dir_reference_others)
+		for file_reference_others in $(ls $dir_reference_others)
 		do
-			echo "FILES_CONTRIB+=${file%.*}.fasta" >> $config_file_make
+			echo "FILES_CONTRIB+=${file_reference_others%.*}.fasta" >> $config_file_make
 		done
 		echo "FILES_CONTRIB+=$file_source_fasta" >> $config_file_make
 		echo "FILE_SOURCE_FASTA_CONTRIB=$file_source_fasta" >> $config_file_make
 		tail -n+5 $dir_scripts/Templates/Makefile_Contribution_Template >> $config_file_make
 	fi
+	if [ "$command" == "novel-discovery" ] || [ "$command" == "all" ]
+	then
+		echo "Preparing Novel miRNA Discovery..."
+		echo "include novel-discovery.mk" >> $subdirectory/Makefile
+		targets+=" novel"
+		mkdir -p $dir_novel
+		config_file_make=$subdirectory/novel-discovery.mk
+		file_reference_genome=$(grep file_reference_genome $file_configuration | cut -f2 | tail -n1)
+		file_mature_hsapiens=$(grep file_mature_hsapiens $file_configuration | cut -f2 | tail -n1)
+		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
+		echo "MATCHED_ALL_FASTA_NOVEL=ContributionAnalysis/Fasta/all.fasta" >> $config_file_make
+		echo "BASE_RESULTS_NOVEL=${file%.*}" >> $config_file_make
+		echo "FILE_GENOME_NOVEL=../$file_reference_genome" >> $config_file_make
+		echo "FILE_SOURCE_MATURE_NOVEL=../$file_mature_hsapiens" >> $config_file_make
+		tail -n+7 $dir_scripts/Templates/Makefile_NovelDiscovery_Template >> $config_file_make
+	fi
+#DIR_SCRIPTS=...
+#FILE_SUMMARY=GenomeMapping/mature_hsapiens/s3_run45_trimmed_summary.txt
+	if [ "$command" == "expression-analysis" ] || [ "$command" == "all" ]
+	then
+		echo "Preparing Expression Analysis..."
+		echo "include expression-analysis.mk" >> $subdirectory/Makefile
+		targets+=" expression"
+		mkdir -p $dir_novel
+		config_file_make=$subdirectory/expression-analysis.mk
+		echo "DIR_SCRIPTS=$dir_scripts" > $config_file_make
+		echo "FILE_SUMMARY_EXPRESSION=$dir_mapping/mature_hsapiens/"$subdirectory"_trimmed_summary.txt" >> $config_file_make
+		tail -n+4 $dir_scripts/Templates/Makefile_ExpressionAnalysis_Template >> $config_file_make
+	fi
+
 	# Complete the subdirectory Makefile
 	echo "" >> $subdirectory/Makefile
 	echo "TARGETS=$targets" >> $subdirectory/Makefile

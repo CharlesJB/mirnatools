@@ -556,7 +556,7 @@ TGGGATGAGGTAGTAGGTTGTATAGTTTTAGGGTCACACCCACCACTGGGAGATAACTATACAATCTACTGTCTTTCCTA
 
         f9<<"<h1>microRNA hairpins</h1>"<<endl;
 
-//        f9<<"<table border=\"1\"><caption>microRNAs with Illumina tags</caption><tbody><tr><th>microRNA (hairpin)</th><th>mirbase link</th><th>Number of tags</th></tr>"<<endl;
+        f9<<"<table border=\"1\"><caption>microRNAs</caption><tbody><tr><th>microRNA (hairpin)</th><th>mirbase link</th><th>Number of tags</th></tr>"<<endl;
         for(map<int,vector<string> >::reverse_iterator i=microRNAsWithMaps.rbegin();i!=microRNAsWithMaps.rend();i++){
                 for(int j=0;j<i->second.size();j++){
                         string name=i->second[j];

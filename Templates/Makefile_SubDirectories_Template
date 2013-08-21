@@ -2,15 +2,5 @@
 #DIR_SCRIPTS=...
 #includes ...
 
-FILE_IMAGE=GenomeMapping/mapping.tiff
-FILE_SUMMARY=GenomeMapping/summary.txt
-
 .PHONY: all
 all: $(TARGETS)
-
-$(FILE_IMAGE): $(FILE_SUMMARY)
-	Rscript $(DIR_SCRIPTS)/Rscripts/GenomeMapping.R $(FILE_SUMMARY) $@
-
-$(FILE_SUMMARY): $(TARGETS_BAM) $(TARGET_FASTA)
-	echo -e "RNA_specie	Count" > $(FILE_SUMMARY)
-	$(DIR_SCRIPTS)/Utility/summarize_mapping.sh | sort -nr -k2 >> $(FILE_SUMMARY)

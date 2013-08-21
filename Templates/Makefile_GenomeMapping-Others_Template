@@ -14,6 +14,8 @@ DIR_FASTA=$(DIR_MAPPING)/fasta
 DIR_REFERENCE_OTHER=reference-others
 
 FILE_FASTQ_OTHER=$(DIR_FASTQ_OTHER)/$(BASE_FASTQ_OTHER)
+FILE_IMAGE=GenomeMapping/mapping.tiff
+FILE_SUMMARY=GenomeMapping/summary.txt
 
 TOOL_SAMTOOLS=$(shell which samtools)
 
@@ -41,3 +43,10 @@ $(DIR_BAM)/%.bam: $(DIR_MAPPING)/$(FILE_FASTQ_OTHER) $(DIR_REFERENCE_OTHER)/%.fa
 
 $(DIR_REFERENCE_OTHER)/%.fasta: $(DIR_SOURCE_REFERENCE_OTHER)/%.fa
 	cat $< | $(DIR_SCRIPTS)/Utility/convertRNAfastaToDNA.py > $@
+
+$(FILE_IMAGE): $(FILE_SUMMARY)
+	Rscript $(DIR_SCRIPTS)/Rscripts/GenomeMapping.R $(FILE_SUMMARY) $@
+
+$(FILE_SUMMARY): $(TARGETS_BAM_OTHER) $(TARGET_FASTA_OTHER)
+	echo -e "RNA_specie	Count" > $(FILE_SUMMARY)
+	$(DIR_SCRIPTS)/Utility/summarize_mapping.sh | sort -nr -k2 >> $(FILE_SUMMARY)

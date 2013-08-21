@@ -21,6 +21,7 @@ for line in open(file_hairpins):
 
 for line in open(file_premature):
 	i=line.split("\t")
-	hairpin=hairpins[int(i[0])]
-	mature=matures[int(i[1])]
-	print hairpin+"\t"+mature
+	if int(i[1]) in matures and int(i[0]) in hairpins:
+		hairpin=hairpins[int(i[0])]
+		mature=matures[int(i[1])]
+		print hairpin+"\t"+mature

@@ -42,8 +42,8 @@ $(DIR_INTERMEDIATE_CONTRIB)/%_Contribution.txt: $(DIR_FASTA_CONTRIB)/%.fasta $(D
 $(TARGET_COUNT_CONTRIB): $(FILE_SOURCE_FASTA_CONTRIB)
 	grep '>' $< | awk '{ sum+=$$NF } END { print sum }' > $@
 
-$(TARGET_ALL_FASTA_CONTRIB): $(TARGETS_FASTA_CONTRIB) $(DIR_SCRIPTS)/Utility/getFasta.py $(FILE_SOURCE_FASTA_CONTRIB)
-	grep '>' $(TARGETS_FASTA_CONTRIB) | awk '{print $$2}' | sort | uniq | $(DIR_SCRIPTS)/Utility/getFasta.py $(FILE_SOURCE_FASTA_CONTRIB) match > $@
+$(TARGET_ALL_FASTA_CONTRIB): $(TARGETS_FASTA_CONTRIB) $(DIR_SCRIPTS)/Utility/getFasta.py $(DIR_SOURCE_FASTA_CONTRIB)/$(FILE_SOURCE_FASTA_CONTRIB)
+	grep '>' $(TARGETS_FASTA_CONTRIB) | awk '{print $$2}' | sort | uniq | $(DIR_SCRIPTS)/Utility/getFasta.py $(DIR_SOURCE_FASTA_CONTRIB)/$(FILE_SOURCE_FASTA_CONTRIB) match > $@
 
 $(DIR_FASTA_CONTRIB)/%.fasta: $(DIR_SOURCE_FASTA_CONTRIB)/%.fasta
 	mkdir -p $(DIR_FASTA_CONTRIB)
