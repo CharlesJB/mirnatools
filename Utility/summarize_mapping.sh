@@ -9,7 +9,8 @@ for file in $(find GenomeMapping/bam/*)
 do 
 	count=$((count+1))
 	name=$(basename ${file%.*})
-	count=$(samtools view -F4 $file | grep 'NM:i:0' | cut -f1 | sort | uniq | ~/git-clones/miRNA-Tools/Utility/getFasta.py RawSequenceFiltering/*.fasta match | grep '>' | awk '{sum += $4} END { print sum }')
+#	count=$(samtools view -F4 $file | grep 'NM:i:0' | cut -f1 | sort | uniq | ~/git-clones/miRNA-Tools/Utility/getFasta.py RawSequenceFiltering/*.fasta match | grep '>' | awk '{sum += $4} END { print sum }')
+	count=$(samtools view -F4 $file | grep 'NM:i:0\|NM:i:1\|NM:i:2\|NM:i:3' | cut -f1 | sort | uniq | ~/git-clones/miRNA-Tools/Utility/getFasta.py RawSequenceFiltering/*.fasta match | grep '>' | awk '{sum += $4} END { print sum }')
 	if [ "$count" == "" ]
 	then
 		count=0
