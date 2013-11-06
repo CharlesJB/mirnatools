@@ -24,4 +24,4 @@ $(DIR_INTERMEDIATE_LENGTH)/%_lengthDistribution.txt: $(DIR_FASTA_LENGTH)/%.fasta
 
 $(DIR_FASTA_LENGTH)/%.fasta: $(DIR_SOURCE_FASTA_LENGTH)/%.fasta
 	mkdir -p $(DIR_FASTA_LENGTH)
-	ln -s ../../$< $@
+	ln -fs ../../$< $@
