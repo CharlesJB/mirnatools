@@ -1,6 +1,0 @@
-# To add with init
-#DIR_SCRIPTS=...
-#includes ...
-
-.PHONY: all
-all: $(TARGETS)

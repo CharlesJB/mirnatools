@@ -1,8 +1,0 @@
-
-.PHONY: all
-all: $(SUBDIRS)
-
-# Thanks to Galik at: http://www.cplusplus.com/forum/unices/28931/
-.PHONY: $(SUBDIRS)
-$(SUBDIRS):
-	$(MAKE) -C $@ all
