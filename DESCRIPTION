@@ -1,0 +1,13 @@
+Package: mirnatools
+Version: 0.1.0
+Date: 2015-06-03
+Title: A package to manage miRNA sequencing data
+Author: Charles Joly Beauparlant <charles.joly-beauparlant@crchul.ulaval.ca>
+Author@R: c(person("Charles", "Joly Beauparlant",
+    email="charles.joly-beauparlant@crchul.ulaval.ca")
+Maintainer: Charles Joly Beauparlant <charles.joly-beauparlant@crchul.ulaval.ca>
+Description: This package contains multiple fonctions to allow the analysis of
+    deep sequencing miRNA datasets.
+License: Artistic-2.0
+BugReports: https://github.com/CharlesJB/miRNA-Tools/issues
+VignetteBuilder: knitr
