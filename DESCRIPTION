@@ -9,5 +9,9 @@ Maintainer: Charles Joly Beauparlant <charles.joly-beauparlant@crchul.ulaval.ca>
 Description: This package contains multiple fonctions to allow the analysis of
     deep sequencing miRNA datasets.
 License: Artistic-2.0
-BugReports: https://github.com/CharlesJB/miRNA-Tools/issues
+BugReports: https://github.com/CharlesJB/mirnatools/issues
 VignetteBuilder: knitr
+Depends:
+    R (>= 3.2.0)
+Imports:
+    GenomicFeatures (>= 1.20.0)
